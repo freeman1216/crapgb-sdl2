@@ -50,6 +50,7 @@ static void hblank_handler(){
         crapstate.ppu.mode = MODE1_VBLANK;
         crapstate.ppu.mode_cycles = CYCLES_PER_SCANLINE;
         set_lcd_mode(MODE1_VBLANK);
+        REQUEST_INTERRUPT(VBLANK_IF_BIT);
         
     }
     check_ly_lyc();

@@ -78,6 +78,7 @@ typedef enum {
 #define INTERRUPT_JOYPAD   0x10  // Bit 4
 #define STAT_IF_BIT     1  
 #define TIMA_IF_BIT     2
+#define VBLANK_IF_BIT   0
 // ==== Interrupt Vector Addresses (for jumps) ====
 #define VBLANK_VECTOR      0x0040
 #define STAT_VECTOR        0x0048
