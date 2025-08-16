@@ -50,7 +50,6 @@ static void hblank_handler(){
         crapstate.ppu.mode = MODE1_VBLANK;
         crapstate.ppu.mode_cycles = CYCLES_PER_SCANLINE;
         set_lcd_mode(MODE1_VBLANK);
-        REQUEST_INTERRUPT(VBLANK_IF_BIT);
         
     }
     check_ly_lyc();
@@ -62,6 +61,7 @@ static void vblank_handler(){
         crapstate.ppu.mode = MODE2_OAM;
         crapstate.ppu.mode_cycles = MODE2_OAM_CYCLES;
         crapstate.io.LY = 0;
+        REQUEST_INTERRUPT(VBLANK_IF_BIT);
         set_lcd_mode(MODE2_OAM);
     }else{
         crapstate.ppu.mode_cycles = CYCLES_PER_SCANLINE;
