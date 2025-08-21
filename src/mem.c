@@ -18,10 +18,8 @@ uint8_t mem_read_byte(uint16_t addr){
         return crapstate.mem.rom0[addr-ROM0_START];
     }else if(addr>=ROMX_START && addr<ROMX_START+ROMX_SIZE){
         return crapstate.mem.romx[addr-ROMX_START];
-    }else if(addr>=WRAM0_START&& addr< WRAM0_START+WRAM0_SIZE){
+    }else if(addr>=WRAM0_START&& addr< WRAMX_START+WRAMX_SIZE){
         return crapstate.mem.wram[addr-WRAM0_START];   
-    }else if(addr>=WRAMX_START && addr<WRAMX_START+WRAMX_SIZE){
-        return crapstate.mem.wram[addr-WRAM0_START];
     }else if(addr>=VRAM_START && addr <VRAM_START+VRAM_SIZE){
         return crapstate.mem.vram[addr-VRAM_START];
     }else if(addr>=OAM_START && addr <OAM_START+OAM_SIZE){
