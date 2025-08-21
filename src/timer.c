@@ -7,7 +7,7 @@ void update_timer(uint16_t cycles) {
     
     // DIV register (always running)
     crapstate.timing.div_cycles+= cycles;
-    if (crapstate.timing.div_cycles >= 256) { // 16384 Hz
+    while (crapstate.timing.div_cycles >= 256) { // 16384 Hz
         crapstate.timing.div_cycles -= 256;
         crapstate.io.DIV++; // DIV
     }
