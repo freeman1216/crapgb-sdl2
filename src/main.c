@@ -16,7 +16,10 @@ int main(int argc,char** argv ){
         mem_init(cartridge);
         crapstate_init();
         cpu_start();
-        int i = 0;
+        FILE* sav = fopen("sav.bin", "rb");
+        if(sav){
+            fread(&crapstate, sizeof(crapstate), 1, sav);
+        }
         while(1){
             update_cpu();
             update_timer(crapstate.cpu.cycles);
