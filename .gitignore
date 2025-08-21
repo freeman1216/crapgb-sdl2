@@ -4,3 +4,4 @@ build/*
 *.gb
 *.txt
 compile_commands.json
+*.bin
