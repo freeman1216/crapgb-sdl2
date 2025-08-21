@@ -1,3 +1,35 @@
+/*
+Three parts of this code are taken from Sameboy emulator by Lior Harpor https://github.com/LIJI32/SameBoy
+  
+
+Expat License
+
+Copyright (c) 2015-2025 Lior Halphon
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+
+
+Everything else you can use however you like
+*/
+
 #include "cpu.h"
 #include "defines.h"
 #include "mem.h"
@@ -454,6 +486,44 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.pc += 2;
             crapstate.cpu.cycles += 8;
             printf("loaded %x to h\n", crapstate.cpu.h);
+            break;
+        }
+
+        case 0x27:  {  // DAA
+ 		/* The following is from SameBoy. MIT License. */
+            int16_t a = crapstate.cpu.a;
+            if(crapstate.cpu.af==0xFFF0){
+                printf("HIT\n");
+            }
+            if (crapstate.cpu.N) {
+                if (crapstate.cpu.H){
+                    a = (a - 0x06) & 0xFF;
+                }
+
+                if (crapstate.cpu.C){
+                    a -= 0x60;
+                }
+
+            } else {
+                if (crapstate.cpu.H || (a & 0x0F) > 9){
+                    a += 0x06;
+                }
+
+                if (crapstate.cpu.C|| a > 0x9F){
+                    a += 0x60;
+                }
+            }
+
+            if ((a & 0x100) == 0x100){
+                crapstate.cpu.C= 1;
+            }
+            printf("daa a%x res %x \n",crapstate.cpu.a,a);
+            crapstate.cpu.a = a;
+            crapstate.cpu.Z = (crapstate.cpu.a == 0);
+            crapstate.cpu.H = 0;
+            crapstate.cpu.pc+=1;
+            crapstate.cpu.cycles+=4;
+
             break;
         }
 
@@ -1508,6 +1578,33 @@ static void opcodes(uint8_t opcode){
             break;
         }
 
+        case 0xE7:  {// RST 20H
+            crapstate.cpu.sp--;
+            mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 1) >> 8); // High byte
+            crapstate.cpu.sp--;
+            mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 1) & 0xFF); // Low byte
+            printf("stored %x%x\n", (crapstate.cpu.pc + 1) >> 8, (crapstate.cpu.pc + 1) & 0xFF);
+            crapstate.cpu.pc = 0x20;
+            printf("calling to vector %x\n", crapstate.cpu.pc);
+            crapstate.cpu.cycles += 16;
+            break;
+        }
+
+        case 0xE8:  {//ADD SP, s8
+		    //Sameboy code MIT licence
+            int8_t offset = (int8_t) mem_read_byte( crapstate.cpu.pc+1);
+		    crapstate.cpu.Z = 0;
+            crapstate.cpu.N = 0;
+		    crapstate.cpu.H = ((crapstate.cpu.sp & 0xF) + (offset & 0xF) > 0xF) ? 1 : 0;
+		    crapstate.cpu.C = ((crapstate.cpu.sp & 0xFF) + (offset & 0xFF) > 0xFF) ? 1 : 0;
+		    crapstate.cpu.sp += offset;
+            crapstate.cpu.pc+=2;
+            crapstate.cpu.cycles+=12;
+            printf("added sp %x+offset %x (%x) ,H%x, C%x\n",crapstate.cpu.sp,offset,crapstate.cpu.sp,crapstate.cpu.H,crapstate.cpu.C);
+            
+            break;
+        }
+
         case 0xEA: { // LD (nn), A
             uint16_t addr = mem_read_word(crapstate.cpu.pc + 1);
             mem_write_byte(addr, crapstate.cpu.a);
@@ -1618,6 +1715,33 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.pc = 0x30;
             printf("calling to vector %x\n", crapstate.cpu.pc);
             crapstate.cpu.cycles += 16;
+            break;
+        }
+
+        case 0xF8: { // LD HL, SP+e8
+          // Sameboy code MIT licence
+          int8_t offset = (int8_t)mem_read_byte(crapstate.cpu.pc + 1);
+          crapstate.cpu.hl = crapstate.cpu.sp + offset;
+          crapstate.cpu.Z = 0;
+          crapstate.cpu.N = 0;
+          crapstate.cpu.H =
+              ((crapstate.cpu.sp & 0xF) + (offset & 0xF) > 0xF) ? 1 : 0;
+          crapstate.cpu.C =
+              ((crapstate.cpu.sp & 0xFF) + (offset & 0xFF) > 0xFF) ? 1 : 0;
+          crapstate.cpu.pc += 2;
+          crapstate.cpu.cycles += 12;
+          printf("loaded sp %x+offset %x (%x) to hl,H%x, C%x\n",
+                 crapstate.cpu.sp, offset, crapstate.cpu.hl, crapstate.cpu.H,
+                 crapstate.cpu.C);
+
+          break;
+        }
+
+        case 0xF9: { //LD SP,HL
+            crapstate.cpu.sp = crapstate.cpu.hl;
+            crapstate.cpu.pc+=1;
+            crapstate.cpu.cycles+=8;
+            printf("loaded hl to sp %x\n",crapstate.cpu.sp);
             break;
         }
 
