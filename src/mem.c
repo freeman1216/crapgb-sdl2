@@ -14,25 +14,65 @@ void mem_init(FILE* rom){
 }
 
 uint8_t mem_read_byte(uint16_t addr){
-    if(addr<ROM0_SIZE){
-        return crapstate.mem.rom0[addr-ROM0_START];
-    }else if(addr>=ROMX_START && addr<ROMX_START+ROMX_SIZE){
-        return crapstate.mem.romx[addr-ROMX_START];
-    }else if(addr>=WRAM0_START&& addr< WRAMX_START+WRAMX_SIZE){
-        return crapstate.mem.wram[addr-WRAM0_START];   
-    }else if(addr>=VRAM_START && addr <VRAM_START+VRAM_SIZE){
-        return crapstate.mem.vram[addr-VRAM_START];
-    }else if(addr>=OAM_START && addr <OAM_START+OAM_SIZE){
-        return crapstate.mem.oam[addr-OAM_START];
+
+    switch (addr>>12) {
+        case 0x0:
+        case 0x1:
+        case 0x2:
+        case 0x3:
+            return crapstate.mem.rom0[addr];
+            break;
+        
+        case 0x4:
+        case 0x5:
+        case 0x6:
+        case 0x7:
+            return crapstate.mem.romx[addr - ROMX_START];
+            break;
+        
+        case 0x8:
+        case 0x9:
+            return crapstate.mem.vram[addr - VRAM_START];
+            break;
+        
+        case 0xA:
+        case 0xB:
+            //unsupported
+            break;
+        case 0xC:
+        case 0xD:
+            return  crapstate.mem.wram[addr - WRAM0_START];
+            break;
+        case 0xE:
+            return crapstate.mem.wram[addr - ECHO_START];
+            break;
+
+        case 0xF:
+            if(addr < OAM_START){
+                return crapstate.mem.wram[addr - ECHO_START];
+            }
+
+            if(addr < UNUSED_START){
+                return crapstate.mem.oam[addr - OAM_START];
+            }
+
+            if(addr < IOREGS_START){
+                return 0x00;
+            }
+
+            if (addr < HRAM_START) {
+                return io_read(addr);
+            }
+
+            if(addr < IE_REG_ADDR){
+                return crapstate.mem.hram[addr - HRAM_START];
+            }
+
+            if(addr == IE_REG_ADDR){
+                return crapstate.io.ie;
+            }
+            break;
     }
-    else if(addr>=IOREGS_START && addr <IOREGS_START+IOREGS_SIZE){
-        return io_read(addr);
-    }else if(addr>=HRAM_START && addr<HRAM_START+HRAM_SIZE){
-        return crapstate.mem.hram[addr-HRAM_START];
-    }
-    else if(addr>=IE_REG_ADDR){
-       return io_read(addr);
-    } 
     return 0;
 };
 
@@ -50,7 +90,7 @@ void handle_bank_switch(uint8_t value) {
 
     if(bank != crapstate.mem.currentromx) {
         if(fseek(crapstate.mem.rom, ROMX_SIZE * (bank), SEEK_SET) != 0) {
-            printf("Bank seek failed!\n");
+            //rintf("Bank seek failed!\n");
             return;
         }
         
@@ -60,52 +100,72 @@ void handle_bank_switch(uint8_t value) {
         }
         
         crapstate.mem.currentromx = bank;
-        printf("Switched to ROM bank %d\n", bank);
+       // printf("Switched to ROM bank %d\n", bank);
     }
 }
 
-void mem_write_byte(uint16_t addr, uint8_t value){
-    if(addr<ROM0_SIZE){
-        if(addr==0x2000){
-            printf("switiching to bank %x\n",value);
-            handle_bank_switch(value);
-        }else{
-            printf("wrote to rom wtf\n ");
-        }
-        return;
-    }
-    else if(addr>=WRAM0_START  && addr<WRAM0_START+WRAM0_SIZE){
-        crapstate.mem.wram[addr-WRAM0_START] = value; 
+void mem_write_byte(uint16_t addr, uint8_t val){
+  switch (addr>>12) {
+        case 0x0:
+        case 0x1:
+        case 0x2:
+        case 0x3:
+            handle_bank_switch(val);
+            break;
         
-        if(addr == 0xC000){
-            printf("0xc000 %x changed\n",value);
-        }
-        return;
-    }
-    else if(addr>=WRAMX_START && addr<WRAMX_START+WRAMX_SIZE){
-        crapstate.mem.wram[addr-WRAM0_START] = value;
-        return;
-    }
-    else if(addr>=VRAM_START && addr <VRAM_START+VRAM_SIZE){
-        crapstate.mem.vram[addr-VRAM_START] = value;
-        return;
-    }
-    else if(addr>=OAM_START && addr <OAM_START+OAM_SIZE){
-        crapstate.mem.oam[addr-OAM_START] = value;
-        return;
-    }
-    else if(addr>=IOREGS_START && addr <IOREGS_START+IOREGS_SIZE){
-        io_write(addr, value);
-        printf("wrote to io %x at addr %x\n",value,addr);
-        return;
+        case 0x4:
+        case 0x5:
+        case 0x6:
+        case 0x7:
+            //bad place to be
+            break;
+        
+        case 0x8:
+        case 0x9:
+            crapstate.mem.vram[addr - VRAM_START] = val;
+            break;
+        case 0xA:
+        case 0xB:
+            //unsupported
+            break;
 
-    }else if(addr>=HRAM_START && addr<HRAM_START+HRAM_SIZE){
-        crapstate.mem.hram[addr-HRAM_START] = value;
-    }
-    else if(addr>=IE_REG_ADDR){
-        io_write(addr, value);
-        printf("wrote to enable interrupt %x\n",value);
-        return;
+        case 0xC:
+        case 0xD:
+            crapstate.mem.wram[addr - WRAM0_START] = val;
+            break;
+
+        case 0xE:
+            crapstate.mem.wram[addr - ECHO_START] = val; 
+            break;
+
+        case 0xF:
+            if(addr < OAM_START ){
+                crapstate.mem.wram[addr - ECHO_START] = val; 
+            }
+
+            if(addr < UNUSED_START){
+                crapstate.mem.oam[addr - OAM_START] = val;
+            }
+
+            if(addr < IOREGS_START){
+                break;
+            }
+
+            if (addr < HRAM_START) {
+                io_write(addr,val);
+                break;
+            }
+
+            if(addr < IE_REG_ADDR){
+                crapstate.mem.hram[addr - HRAM_START] = val;
+                break;
+            }
+
+            if(addr == IE_REG_ADDR){
+                crapstate.io.ie = val & 0x1F; 
+                break;
+            }
+
     }   
     
 }
@@ -117,7 +177,6 @@ void mem_write_word(uint16_t addr, uint16_t value){
 }
 
 
-
 static void  inline io_write(uint16_t addr, uint8_t val) {
     switch (addr) {
         // Joypad
@@ -126,7 +185,11 @@ static void  inline io_write(uint16_t addr, uint8_t val) {
             break;
             
         // Serial
-        case 0xFF01: crapstate.io.SB = val; break;
+        case 0xFF01: {
+            crapstate.io.SB = val;
+            printf("%c",val);
+            break;
+        }
         case 0xFF02: crapstate.io.SC = val & 0x83; break; // Only bits 0-1,7 writable
         
         // Timer
@@ -156,7 +219,6 @@ static void  inline io_write(uint16_t addr, uint8_t val) {
             uint16_t src = val << 8; // Source address (XX00-XX9F)
             
     
-            // Unrolled copy (20% faster on ARM)
             for (int i = 0; i < 160; i ++) {
                 crapstate.mem.oam[i]   = mem_read_byte(src + i);
             }
@@ -172,7 +234,6 @@ static void  inline io_write(uint16_t addr, uint8_t val) {
         
         // Interrupts
         case 0xFF0F: crapstate.io.if_reg = val & 0x1F; break;
-        case 0xFFFF: crapstate.io.ie = val & 0x1F; break;
             
         default: break; // Ignore writes to unused
     }
@@ -229,7 +290,6 @@ static uint8_t inline io_read(uint16_t addr) {
         case 0xFF50: return 0x1;
         // Interrupts
         case 0xFF0F: return crapstate.io.if_reg | 0xE0; // Upper bits 1
-        case 0xFFFF: return crapstate.io.ie;
             
         default: return 0xFF; // Unused I/O
     }
