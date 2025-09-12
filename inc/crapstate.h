@@ -6,21 +6,22 @@ typedef struct {
     // CPU Core
     struct {
         // Main registers
-         union{
-        struct{
-            
-            struct{ 
-                uint8_t unused : 4; // lower 4 bits are always zero in F
-                uint8_t C : 1;      // Carry flag (bit 4)
-                uint8_t H : 1;      // Half Carry flag (bit 5)
-                uint8_t N : 1;      // Subtract flag (bit 6)
-                uint8_t Z : 1;
-            };  
+        union{
+            struct{
+                union{
+                    struct{ 
+                        uint8_t unused : 4; // lower 4 bits are always zero in F
+                        uint8_t C : 1;      // Carry flag (bit 4)
+                        uint8_t H : 1;      // Half Carry flag (bit 5)
+                        uint8_t N : 1;      // Subtract flag (bit 6)
+                        uint8_t Z : 1;
+                    };
+                uint8_t f;
+                };
             uint8_t a;
-            
-        };
+            };
         uint16_t af;
-    };
+        };
         union { uint16_t bc; struct { uint8_t c, b; }; };
         union { uint16_t de; struct { uint8_t e, d; }; };
         union { uint16_t hl; struct { uint8_t l, h; }; };

@@ -165,9 +165,8 @@
 // 8-bit bitwise operations
 #define AND_A_R8(operand)                                                      \
   crapstate.cpu.a &= crapstate.cpu.operand;                                    \
+  crapstate.cpu.f = 0;                                                         \
   crapstate.cpu.H = 1;                                                         \
-  crapstate.cpu.N = 0;                                                         \
-  crapstate.cpu.C = 0;                                                         \
   crapstate.cpu.Z = !crapstate.cpu.a;                                          \
   crapstate.cpu.pc += 1;                                                       \
   crapstate.cpu.cycles += 4;                                                   \
@@ -175,20 +174,16 @@
 
 #define XOR_A_R8(operand)                                                      \
   crapstate.cpu.a ^= crapstate.cpu.operand;                                    \
+  crapstate.cpu.f = 0;                                                          \
   crapstate.cpu.Z = !crapstate.cpu.a;                                          \
-  crapstate.cpu.C = 0;                                                         \
-  crapstate.cpu.N = 0;                                                         \
-  crapstate.cpu.H = 0;                                                         \
   crapstate.cpu.pc++;                                                          \
   crapstate.cpu.cycles += 4;                                                   \
   break
 
 #define OR_A_R8(operand)                                                       \
   crapstate.cpu.a = crapstate.cpu.a | crapstate.cpu.operand;                   \
+  crapstate.cpu.f = 0;                                                         \
   crapstate.cpu.Z = !crapstate.cpu.a;                                          \
-  crapstate.cpu.H = 0;                                                         \
-  crapstate.cpu.N = 0;                                                         \
-  crapstate.cpu.C = 0;                                                         \
   crapstate.cpu.pc++;                                                          \
   crapstate.cpu.cycles += 4;                                                   \
   break
@@ -216,72 +211,64 @@
 #define RLC_R8(operand)                                                        \
   crapstate.cpu.operand =                                                      \
       (crapstate.cpu.operand << 1) | (crapstate.cpu.operand >> 7);             \
+  crapstate.cpu.f = 0;                                                          \
   crapstate.cpu.C = crapstate.cpu.operand & 0x1;                               \
   crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
-  crapstate.cpu.H = 0;                                                         \
-  crapstate.cpu.N = 0;                                                         \
   break
 
 #define RRC_R8(operand)                                                        \
+  crapstate.cpu.f = 0;                                                         \
   crapstate.cpu.C = crapstate.cpu.operand & 0x1;                               \
   crapstate.cpu.operand =                                                      \
-      (crapstate.cpu.operand >> 1) | (crapstate.cpu.operand << 7);             \
+  (crapstate.cpu.operand >> 1) | (crapstate.cpu.operand << 7);                 \
   crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
-  crapstate.cpu.H = 0;                                                         \
-  crapstate.cpu.N = 0;                                                         \
   break
 
 #define RL_R8(operand)                                                         \
   uint8_t old_carry = crapstate.cpu.C;                                         \
+  crapstate.cpu.f = 0;                                                         \
   crapstate.cpu.C = (crapstate.cpu.operand) & 0x80 ? 1 : 0;                    \
   crapstate.cpu.operand <<= 1;                                                 \
   crapstate.cpu.operand |= old_carry;                                          \
-  crapstate.cpu.H = 0;                                                         \
   crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
-  crapstate.cpu.N = 0;                                                         \
   break
 
 #define RR_R8(operand)                                                         \
   uint8_t old_carry = crapstate.cpu.C;                                         \
+  crapstate.cpu.f = 0;                                                         \
   crapstate.cpu.C = crapstate.cpu.operand & 1;                                 \
   crapstate.cpu.operand >>= 1;                                                 \
-  crapstate.cpu.H = 0;                                                         \
-  crapstate.cpu.N = 0;                                                         \
   crapstate.cpu.operand |= (old_carry << 7);                                   \
   crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
   break
 
 #define SLA_R8(operand)                                                        \
+  crapstate.cpu.f = 0;                                                         \
   crapstate.cpu.C = (crapstate.cpu.operand & 0x80) != 0;                       \
   crapstate.cpu.operand <<= 1;                                                 \
   crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
-  crapstate.cpu.H = 0;                                                         \
-  crapstate.cpu.N = 0;                                                         \
   break
 
 #define SRA_R8(operand)                                                        \
+  crapstate.cpu.f = 0;                                                         \
   crapstate.cpu.C = crapstate.cpu.operand & 0x1;                               \
   crapstate.cpu.operand =                                                      \
       (crapstate.cpu.operand >> 1) | (crapstate.cpu.operand & 0x80);           \
   crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
-  crapstate.cpu.N = 0;                                                         \
-  crapstate.cpu.H = 0;                                                         \
   break
 
 #define SWAP_R8(operand)                                                       \
   crapstate.cpu.operand =                                                      \
       (crapstate.cpu.operand << 4) | (crapstate.cpu.operand >> 4);             \
+  crapstate.cpu.f = 0;                                                         \
   crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
-  crapstate.cpu.H = 0;                                                         \
-  crapstate.cpu.N = 0;                                                         \
-  crapstate.cpu.C = 0;                                                         \
   break
+
 #define SRL_R8(operand)                                                        \
+  crapstate.cpu.f = 0;                                                         \
   crapstate.cpu.C = (crapstate.cpu.operand & 0x01);                            \
   crapstate.cpu.operand >>= 1;                                                 \
   crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
-  crapstate.cpu.H = 0;                                                         \
-  crapstate.cpu.N = 0;                                                         \
   break
 
 #define BIT_N_R8(bit, operand)                                                 \
