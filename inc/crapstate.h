@@ -91,6 +91,9 @@ typedef struct {
         uint16_t mode_cycles; // Cycles in current mode
     } ppu;
 
+    struct{
+        uint8_t pixels[PIXELS_PER_SCANLINE][VISIBLE_SCANLINES];
+    } renderer;
 
     struct {
         uint8_t right:1, left:1, up:1, down:1;

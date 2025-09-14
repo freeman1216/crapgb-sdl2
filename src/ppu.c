@@ -2,7 +2,7 @@
 #include "crapstate.h"
 #include "defines.h"
 #include <stdint.h>
-#include "renderer.h"
+
 
 
 #define REQUEST_INTERRUPT(bit)  crapstate.io.if_reg |= (1 << bit) // IF register
@@ -44,10 +44,10 @@ void start_ppu(){
 }
 
 static void hblank_handler(){
-    if(++crapstate.io.LY!=VBLANK_START_LINE){
+    if(++crapstate.io.LY!=VISIBLE_SCANLINES){
         crapstate.ppu.mode = MODE2_OAM;
         crapstate.ppu.mode_cycles = MODE2_OAM_CYCLES;
-        renderer_draw_line();
+        
         set_lcd_mode(MODE2_OAM);
     }else{
         crapstate.ppu.mode = MODE1_VBLANK;

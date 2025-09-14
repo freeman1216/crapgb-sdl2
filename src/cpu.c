@@ -2857,7 +2857,6 @@ static inline void handle_interrupt() {
     } 
 }
 
-static FILE* log;
 
 void update_cpu(){
     handle_interrupt();
@@ -2868,30 +2867,9 @@ void update_cpu(){
     }
 
     uint8_t op =mem_read_byte(crapstate.cpu.pc);
-    /*
-    fprintf(log, "OP:%02X%s PC:%04X AF:%04X BC:%04X DE:%04X SP:%04X HL:%04X ",
-    op,
-    crapstate.cpu.halted ? "(HALTED)" : "",
-    crapstate.cpu.pc,
-    crapstate.cpu.af,
-    crapstate.cpu.bc,
-    crapstate.cpu.de,
-    crapstate.cpu.sp,
-    crapstate.cpu.hl);
-    fprintf(log, "LCD Mode: %02X (%d), LCD Power: %02X (%s) ",
-    crapstate.io.STAT, crapstate.ppu.mode,
-    crapstate.io.LCDC, (crapstate.io.LCDC >> 7) ? "ON" : "OFF");
-    fprintf(log, "IF: %02X, IE: %02X ",
-    crapstate.io.if_reg, crapstate.io.ie);
-    fprintf(log, "ROM%d", crapstate.mem.currentromx);
-    fprintf(log, "\n");
-    */
     opcodes(mem_read_byte(crapstate.cpu.pc));
     
 }
 void cpu_start(){
-    
-    log = fopen("logs.txt", "w");
-    
-    
+    ;
 }

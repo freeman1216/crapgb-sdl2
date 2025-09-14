@@ -16,6 +16,7 @@ int main(int argc,char** argv ){
         mem_init(cartridge);
         crapstate_init();
         cpu_start();
+        
         FILE* sav = fopen("sav.bin", "rb");
         if(sav){
             fread(&crapstate, sizeof(crapstate), 1, sav);
