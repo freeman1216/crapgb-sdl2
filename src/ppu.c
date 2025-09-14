@@ -2,14 +2,16 @@
 #include "crapstate.h"
 #include "defines.h"
 #include <stdint.h>
+#include "renderer.h"
+
 
 #define REQUEST_INTERRUPT(bit)  crapstate.io.if_reg |= (1 << bit) // IF register
     
 static inline void check_ly_lyc() {
     if (crapstate.io.LY == crapstate.io.LYC) {
-        crapstate.io.STAT |= (1 << 2); // Set coincidence flag
+        crapstate.io.STAT |= (1 << 2); 
         if (crapstate.io.STAT & (1 << 6)) {
-            REQUEST_INTERRUPT(STAT_IF_BIT); // STAT interrupt
+            REQUEST_INTERRUPT(STAT_IF_BIT); 
         }
     } else {
         crapstate.io.STAT &= ~(1 << 2); // Clear coincidence flag
@@ -23,7 +25,7 @@ static inline void set_lcd_mode(uint8_t mode) {
     // Trigger STAT interrupt if enabled for this mode
     if (mode <= 2) {
         if (crapstate.io.STAT & (1 << (mode + 3))) {
-            REQUEST_INTERRUPT(STAT_IF_BIT); // STAT interrupt
+            REQUEST_INTERRUPT(STAT_IF_BIT); 
         }
     }
 }
@@ -45,8 +47,9 @@ static void hblank_handler(){
     if(++crapstate.io.LY!=VBLANK_START_LINE){
         crapstate.ppu.mode = MODE2_OAM;
         crapstate.ppu.mode_cycles = MODE2_OAM_CYCLES;
+        renderer_draw_line();
         set_lcd_mode(MODE2_OAM);
-    }else {
+    }else{
         crapstate.ppu.mode = MODE1_VBLANK;
         crapstate.ppu.mode_cycles = CYCLES_PER_SCANLINE;
         set_lcd_mode(MODE1_VBLANK);
@@ -93,7 +96,7 @@ static void oam_search_hander(){
 
 }
 
-static void(*mode_change_handlers[]) (void) = {
+static void (* const mode_change_handlers[])  (void) = {
     [MODE0_HBLANK] = hblank_handler,
     [MODE1_VBLANK] = vblank_handler,
     [MODE2_OAM] = oam_search_hander,

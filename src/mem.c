@@ -75,7 +75,7 @@ uint8_t mem_read_byte(uint16_t addr){
     }
     return 0;
 };
-
+//TODO get rid of this 
 uint16_t mem_read_word(uint16_t addr) {
     uint8_t low = mem_read_byte(addr);
     uint8_t high = mem_read_byte(addr + 1);
@@ -90,7 +90,7 @@ void handle_bank_switch(uint8_t value) {
 
     if(bank != crapstate.mem.currentromx) {
         if(fseek(crapstate.mem.rom, ROMX_SIZE * (bank), SEEK_SET) != 0) {
-            //rintf("Bank seek failed!\n");
+            printf("Bank seek failed!\n");
             return;
         }
         
@@ -169,6 +169,7 @@ void mem_write_byte(uint16_t addr, uint8_t val){
     }   
     
 }
+//TODO get rid of this 
 void mem_write_word(uint16_t addr, uint16_t value){
     
     mem_write_byte(addr, value & 0xFF);         // write low byte
