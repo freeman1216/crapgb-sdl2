@@ -1156,9 +1156,6 @@ static inline void opcodes_cb(uint8_t postfix){
         default:{
             
             printf("unhandled cb postcode %x\n",postfix);
-            FILE* sav = fopen("sav.bin","wb");
-            fwrite(&crapstate, sizeof(crapstate), 1, sav);
-            fclose(sav);
             while(1);
         }
     }
@@ -2813,9 +2810,6 @@ static void opcodes(uint8_t opcode){
         
         default:{
             printf("Unhandled opcode: %X\n", opcode);
-            FILE* sav = fopen("sav.bin","wb");
-            fwrite(&crapstate, sizeof(crapstate), 1, sav);
-            fclose(sav);
             while(1);
             break;
         }
