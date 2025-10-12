@@ -51,7 +51,8 @@ typedef struct {
         
         // Graphics
         uint8_t vram[VRAM_SIZE]; // VRAM
-        uint8_t oam[OAM_SIZE];     // Sprite RAM
+        
+        uint8_t oam[OAM_SIZE] __attribute__((aligned(4)));     // Sprite RAM
         
        
     } mem;
@@ -92,8 +93,15 @@ typedef struct {
     } ppu;
 
     struct{
-        uint8_t pixels[PIXELS_PER_SCANLINE][VISIBLE_SCANLINES];
-    } renderer;
+        uint16_t pixels[VISIBLE_SCANLINES][PIXELS_PER_SCANLINE];
+        uint16_t palette[4];
+        uint8_t OBP_indeces[2][4];
+        uint8_t BGP_indeces[4] ;
+        uint8_t window_curr_line;
+        uint8_t vblank_counter;
+    } display;
+
+
 
     struct {
         uint8_t right:1, left:1, up:1, down:1;

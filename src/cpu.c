@@ -2860,7 +2860,6 @@ void update_cpu(){
         crapstate.cpu.ime=1;
     }
 
-    uint8_t op =mem_read_byte(crapstate.cpu.pc);
     opcodes(mem_read_byte(crapstate.cpu.pc));
     
 }

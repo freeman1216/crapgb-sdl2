@@ -217,7 +217,7 @@ static void  inline io_write(uint16_t addr, uint8_t val) {
         case 0xFF43: crapstate.io.SCX = val; break;
         case 0xFF45: crapstate.io.LYC = val; break;
         case 0xFF46: {
-            uint16_t src = val << 8; // Source address (XX00-XX9F)
+            uint16_t src = val << 8; 
             
     
             for (int i = 0; i < 160; i ++) {
@@ -225,11 +225,33 @@ static void  inline io_write(uint16_t addr, uint8_t val) {
             }
     
             crapstate.cpu.cycles += 640;
-
-        } break; // Special DMA case
-        case 0xFF47: crapstate.io.BGP = val; break;
-        case 0xFF48: crapstate.io.OBP0 = val; break;
-        case 0xFF49: crapstate.io.OBP1 = val; break;
+            break;
+        }
+          
+        case 0xFF47:{ 
+            crapstate.io.BGP = val;
+            crapstate.display.BGP_indeces[0] = val & 0x3;
+            crapstate.display.BGP_indeces[1] = (val>>2) & 0x3;
+            crapstate.display.BGP_indeces[2] = (val>>4) & 0x3;
+            crapstate.display.BGP_indeces[3] = (val>>6) & 0x3;
+            break;
+        }   
+        case 0xFF48:{ 
+            crapstate.io.OBP0 = val; 
+            crapstate.display.OBP_indeces[0][0] = val & 0x3;
+            crapstate.display.OBP_indeces[0][1] = (val>>2) & 0x3;
+            crapstate.display.OBP_indeces[0][2] = (val>>4) & 0x3;
+            crapstate.display.OBP_indeces[0][3] = (val>>6) & 0x3;
+            break;
+        }
+        case 0xFF49:{ 
+            crapstate.io.OBP1 = val;
+            crapstate.display.OBP_indeces[1][0] = val & 0x3;
+            crapstate.display.OBP_indeces[1][1] = (val>>2) & 0x3;
+            crapstate.display.OBP_indeces[1][2] = (val>>4) & 0x3;
+            crapstate.display.OBP_indeces[1][3] = (val>>6) & 0x3;
+            break;
+        }
         case 0xFF4A: crapstate.io.WY = val; break;
         case 0xFF4B: crapstate.io.WX = val; break;
         

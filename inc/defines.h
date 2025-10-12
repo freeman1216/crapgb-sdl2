@@ -4,7 +4,6 @@
 
 
 
-// Offsets in io[] array (addr - 0xFF00)
 #define REG_JOYP      0x00  // Joypad input
 #define REG_DIV       0x04  // Divider register
 #define REG_TIMA      0x05  // Timer counter
@@ -68,9 +67,29 @@ typedef enum {
 #define MODE3_DRAW_CYCLES   172
 #define MODE0_HBLANK_CYCLES (CYCLES_PER_SCANLINE - MODE2_OAM_CYCLES - MODE3_DRAW_CYCLES)
 #define TOTAL_SCANLINES     154
-#define VISIBLE_SCANLINES  144
+#define VISIBLE_SCANLINES   144
 #define FAKE_VBLANK_CYCLES  4 
 #define PIXELS_PER_SCANLINE 160
+
+#define TILESET_UNSIGNED   0x8000
+#define TILESET_SIGNED     0x9000
+//LCDC bit masks
+#define LCDC_PPU_ENABLE_MASK        (0x80)
+#define LCDC_WINDOW_TILE_MAP_MASK   (0x40)
+#define LCDC_WINDOW_ENABLE_MASK     (0x20)
+#define LCDC_TILESET_MASK           (0x10)
+#define LCDC_BG_TILE_MAP_MASK       (0x08)
+#define LCDC_OBJ_SIZE_MASK          (0x04)
+#define LCDC_OBJ_ENABLE_MASK        (0x02)
+#define LCDC_BG_ENABLE_MASK         (0x01)
+#define BG_WIN_ENABLE_MASK          (LCDC_BG_ENABLE_MASK | LCDC_WINDOW_ENABLE_MASK)
+//Sprite define
+#define NUM_OF_SPRITES      (40)
+#define ATTR_PRIORITY_MASK  (0x80)
+#define ATTR_YFLIP_MASK     (0x40)
+#define ATTR_XFLIP_MASK     (0x20)
+#define ATTR_PALLETE_MASK   (0x10)
+
 //interrupt defines
 #define INTERRUPT_VBLANK   0x01  // Bit 0
 #define INTERRUPT_STAT     0x02  // Bit 1
