@@ -10,6 +10,8 @@
 
 
 
+
+
 #define REQUEST_INTERRUPT(bit)  crapstate.io.if_reg |= (1 << bit) // IF register
 
 void render_tileset(){
@@ -322,7 +324,7 @@ static inline void render_line(){
     }
     
 }
-    
+
 static inline void check_ly_lyc() {
     if (crapstate.io.LY == crapstate.io.LYC) {
         crapstate.io.STAT |= (1 << 2); 
@@ -390,26 +392,26 @@ static void vblank_handler(){
 #endif
         set_lcd_mode(MODE2_OAM);
     }else{
+        
         crapstate.ppu.mode_cycles = CYCLES_PER_SCANLINE;
     }
-    check_ly_lyc();
 }
 
 //mode in which ppu is after bootrom
 static void fake_vblank_hander(){
-
+    
     crapstate.ppu.mode= MODE2_OAM;
     crapstate.ppu.mode_cycles =MODE2_OAM_CYCLES;
     check_ly_lyc(); //can fire right after bootrom
     set_lcd_mode(MODE2_OAM);
-
+    
 }
 
 static void draw_handler(){
     crapstate.ppu.mode = MODE0_HBLANK;
     crapstate.ppu.mode_cycles = MODE0_HBLANK_CYCLES;
     set_lcd_mode(MODE0_HBLANK);
-
+    
 }
 
 static void oam_search_hander(){
@@ -417,7 +419,7 @@ static void oam_search_hander(){
     crapstate.ppu.mode = MODE3_DRAW;
     crapstate.ppu.mode_cycles = MODE3_DRAW_CYCLES;
     set_lcd_mode(MODE3_DRAW);
-
+    
 }
 
 static void (* const mode_change_handlers[])  (void) = {
@@ -429,18 +431,17 @@ static void (* const mode_change_handlers[])  (void) = {
 };
 
 
-
 void update_ppu(uint16_t clocks){
     if(crapstate.ppu.mode == MODE_DISABLED){
         return;
     }
     
     while(clocks != 0){
-    
+        
         uint16_t step = (clocks > crapstate.ppu.mode_cycles) ?  crapstate.ppu.mode_cycles : clocks; 
         crapstate.ppu.mode_cycles-= step;
         clocks -= step;
-
+        
         if(crapstate.ppu.mode_cycles==0){
             mode_change_handlers[crapstate.ppu.mode]();
         }

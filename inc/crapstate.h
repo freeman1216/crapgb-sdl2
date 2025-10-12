@@ -2,6 +2,12 @@
 #include <stdint.h>
 #include "defines.h"
 #include "stdio.h"
+
+#ifdef ENABLE_GRAPHICS
+#include <SDL2/SDL.h>
+#include<SDL2/SDL_video.h>
+#endif
+
 typedef struct {
     // CPU Core
     struct {
@@ -57,7 +63,7 @@ typedef struct {
        
     } mem;
         // I/O Ports (mapped to 0xFF00-0xFF7F)
-        struct {
+    struct {
         uint8_t P1;   // FF00
         uint8_t SB;   // FF01
         uint8_t SC;   // FF02
@@ -99,9 +105,16 @@ typedef struct {
         uint8_t BGP_indeces[4] ;
         uint8_t window_curr_line;
         uint8_t vblank_counter;
+
     } display;
 
-
+#ifdef ENABLE_GRAPHICS
+    struct{
+        SDL_Renderer* SDL_renderer;
+        SDL_Texture*  SDL_texture;
+       
+    }renderer;
+#endif
 
     struct {
         uint8_t right:1, left:1, up:1, down:1;

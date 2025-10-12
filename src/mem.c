@@ -219,7 +219,7 @@ static void  inline io_write(uint16_t addr, uint8_t val) {
         case 0xFF46: {
             uint16_t src = val << 8; 
             
-    
+            
             for (int i = 0; i < 160; i ++) {
                 crapstate.mem.oam[i]   = mem_read_byte(src + i);
             }
@@ -276,7 +276,7 @@ static inline uint8_t read_joypad() {
     if (!(crapstate.io.P1 & 0x20)) {
         if (crapstate.buttons.A)      result &= ~(1 << 0);
         if (crapstate.buttons.B)      result &= ~(1 << 1);
-        if (crapstate.buttons.start)  result &= ~(1 << 2);
+        if (1)  result &= ~(1 << 2);
         if (crapstate.buttons.select) result &= ~(1 << 3);
     }
     
