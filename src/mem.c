@@ -276,7 +276,7 @@ static inline uint8_t read_joypad() {
     if (!(crapstate.io.P1 & 0x20)) {
         if (crapstate.buttons.A)      result &= ~(1 << 0);
         if (crapstate.buttons.B)      result &= ~(1 << 1);
-        if (1)  result &= ~(1 << 2);
+        if (crapstate.buttons.start)  result &= ~(1 << 2);
         if (crapstate.buttons.select) result &= ~(1 << 3);
     }
     
