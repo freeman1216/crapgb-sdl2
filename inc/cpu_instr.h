@@ -305,3 +305,6 @@
   mem_write_byte(crapstate.cpu.hl, byte);                                      \
   crapstate.cpu.cycles += 8;                                                   \
   break
+#define UNHANDLED_OPCODE()\
+  printf("Unhandled opcode: %X\n", opcode);\
+  while(1);

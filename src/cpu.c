@@ -1266,6 +1266,11 @@ static void opcodes(uint8_t opcode){
             break;
         }
         
+        case 0x10:{
+            //STOP NYI
+            UNHANDLED_OPCODE();
+        }
+        
         case 0x11:{//LD DE, n16
             LD_R16_N16(de);
         }
@@ -2486,6 +2491,11 @@ static void opcodes(uint8_t opcode){
             break;
         }
         
+        case 0xD3: {
+            //ILLEGAL OPCODE
+            UNHANDLED_OPCODE();
+        }
+        
         case 0xD4: { // CALL NC
             if (!crapstate.cpu.C) {
                 crapstate.cpu.sp--;
@@ -2562,6 +2572,11 @@ static void opcodes(uint8_t opcode){
             break;
         }
         
+        case 0xDB: {
+            //ILLEGAL OPCODE
+            UNHANDLED_OPCODE();
+        }
+        
         case 0xDC:  {//CALL C
             if (crapstate.cpu.C) {
                 crapstate.cpu.sp--;
@@ -2577,6 +2592,11 @@ static void opcodes(uint8_t opcode){
                 crapstate.cpu.cycles += 12;
             }
             break;
+        }
+        
+        case 0xDD: {
+            //ILLEGAL OPCODE
+            UNHANDLED_OPCODE();
         }
         
         case 0xDF:  {//RST 18H
@@ -2621,6 +2641,16 @@ static void opcodes(uint8_t opcode){
             break;
         }
         
+        case 0xE3: {
+            //ILLEGAL OPCODE
+            UNHANDLED_OPCODE();
+        }
+
+        case 0xE4: {
+            //ILLEGAL OPCODE
+            UNHANDLED_OPCODE();
+        }
+        
         case 0xE5: { // PUSH HL
             PUSH_R16(h, l);
         }
@@ -2655,6 +2685,13 @@ static void opcodes(uint8_t opcode){
             break;
         }
         
+        case 0xE9: { // JP HL
+            crapstate.cpu.pc = crapstate.cpu.hl;
+            //printf("jump to hl %x\n", crapstate.cpu.pc);
+            crapstate.cpu.cycles += 4;
+            break;
+        }
+        
         case 0xEA: { // LD (nn), A
             uint16_t addr = mem_read_word(crapstate.cpu.pc + 1);
             mem_write_byte(addr, crapstate.cpu.a);
@@ -2662,6 +2699,21 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.pc += 3;
             crapstate.cpu.cycles += 16;
             break;
+        }
+        
+        case 0xEB: {
+            //ILLEGAL OPCODE
+            UNHANDLED_OPCODE();
+        }
+
+        case 0xEC: {
+            //ILLEGAL OPCODE
+            UNHANDLED_OPCODE();
+        }
+
+        case 0xED: {
+            //ILLEGAL OPCODE
+            UNHANDLED_OPCODE();
         }
         
         case 0xEE:  { //XOR A, n8
@@ -2679,12 +2731,6 @@ static void opcodes(uint8_t opcode){
             RST(0x28);
         }
         
-        case 0xE9: { // JP HL
-            crapstate.cpu.pc = crapstate.cpu.hl;
-            //printf("jump to hl %x\n", crapstate.cpu.pc);
-            crapstate.cpu.cycles += 4;
-            break;
-        }
         
         case 0xF0: { // LDH A, (n)
             uint16_t addr = 0xFF00 + mem_read_byte(crapstate.cpu.pc + 1);
@@ -2720,6 +2766,11 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.cycles += 4;
             //printf("disabled interrupts\n");
             break;
+        }
+        
+        case 0xF4: {
+            //ILLEGAL OPCODE
+            UNHANDLED_OPCODE();
         }
         
         case 0xF5: { // PUSH AF
@@ -2789,6 +2840,16 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.cycles += 4;
             //printf("enabled interrupts\n");
             break;
+        }
+        
+        case 0xFC: {
+            //ILLEGAL OPCODE
+            UNHANDLED_OPCODE();
+        }
+
+        case 0xFD: {
+            //ILLEGAL OPCODE
+            UNHANDLED_OPCODE();
         }
         
         case 0xFE: { //CP A N8
