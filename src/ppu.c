@@ -1,10 +1,11 @@
+#include <stdint.h>
+
 #include "ppu.h"
 #include "crapstate.h"
 #include "defines.h"
-#include <stdint.h>
 
 
-
+//internal function to draw a line of the bg to the fb
 static inline void __render_bg(){
     uint8_t pix_y = crapstate.io.LY + crapstate.io.SCY;
     uint8_t tile_y = pix_y >> 3;
@@ -63,7 +64,7 @@ static inline void __render_bg(){
         }
     }
 }
-
+//internal function to draw a line of the window to the fb
 static inline void __render_window(){
     uint16_t map_base;
     
@@ -136,6 +137,8 @@ typedef struct{
     uint8_t sprite_count;
 }sprite_list_t;
 
+
+//internal function to find a max of 10 sprites to render
 static inline void __insert_sprite(sprite_list_t* render_list, sprite_data_t* candidate){
     uint8_t pos = 0;
 
@@ -169,7 +172,8 @@ static inline void __insert_sprite(sprite_list_t* render_list, sprite_data_t* ca
     
     
 }
-
+// internal function to render 1 line of sprites to the fb
+// finds 10 most prioritised sprites and renders them from least prioritised to most
 static inline void __render_sprites(){ 
     sprite_data_t *sprite_view =(sprite_data_t *)crapstate.mem.oam;
     sprite_list_t list ;
@@ -183,6 +187,7 @@ static inline void __render_sprites(){
         sprite_view++;
     }
 
+    
     for( ; list.sprite_count != 0x0; list.sprite_count-- ){
         sprite_view = list.sprite_list[list.sprite_count-1];
         
@@ -193,7 +198,7 @@ static inline void __render_sprites(){
         uint8_t tile_index = sprite_view->tile_index & ~((crapstate.io.LCDC & 0x04) >> 2);
         uint8_t py = crapstate.io.LY+16 - (sprite_view->y);
         
-        if(sprite_view->attributes & ATTR_YFLIP_MASK){
+        if(sprite_view->attributes & ATTR_YFLIP_MASK){ // if y flip just fetch the other side of the sprite
             py = (7+added_y) - py;
         }
         
@@ -205,7 +210,7 @@ static inline void __render_sprites(){
         uint8_t inc;
         uint8_t pixnum;
         uint8_t palette;
-        if(sprite_view->attributes & ATTR_XFLIP_MASK){
+        if(sprite_view->attributes & ATTR_XFLIP_MASK){ // if x flip just render from left to right
             inc = 1;
             draw_x = sprite_view->x >= 8 ? sprite_view->x - 8 : 0;
             x_rem = 8 - sprite_view->x + draw_x;
@@ -225,10 +230,11 @@ static inline void __render_sprites(){
         
         tb1 >>= x_rem;
         tb2 >>= x_rem;
+
         if(sprite_view->attributes & ATTR_PRIORITY_MASK){
             uint16_t bg_colour = crapstate.display.palette[0]; 
             for (; x_rem < pixnum ; x_rem++) {
-                uint8_t palette_index = (tb1 & 0x1)|((tb2&1)<<1);
+                uint8_t palette_index = (tb1 & 1)|((tb2 & 1)<<1);
                 if(crapstate.display.pixels[crapstate.io.LY][draw_x] == bg_colour && palette_index){
                     uint8_t colour = crapstate.display.OBP_indeces[palette][palette_index];
                     crapstate.display.pixels[crapstate.io.LY][draw_x]=crapstate.display.palette[colour];
@@ -239,7 +245,7 @@ static inline void __render_sprites(){
             }
         }else {
             for (; x_rem < pixnum ; x_rem++) {
-                uint8_t palette_index = (tb1 & 0x1)|((tb2&1)<<1);  
+                uint8_t palette_index = (tb1 & 1)|((tb2 & 1)<<1);  
                 if(palette_index){
                     uint8_t colour = crapstate.display.OBP_indeces[palette][palette_index];
                     crapstate.display.pixels[crapstate.io.LY][draw_x]=crapstate.display.palette[colour];
@@ -252,6 +258,8 @@ static inline void __render_sprites(){
     }
 }
 
+//renders the line to the framebuffer
+//midscanline effects doesnt work because of the nature of per scanline rendering
 static inline void render_line(){
     
     if(crapstate.io.LCDC & LCDC_BG_ENABLE_MASK){
@@ -301,9 +309,10 @@ void stop_ppu(){
 }
 
 void start_ppu(){
-    crapstate.ppu.mode = 2;
+    crapstate.ppu.mode = MODE2_OAM;
     crapstate.ppu.mode_cycles = MODE2_OAM_CYCLES;
     crapstate.io.LY = 0;
+    set_lcd_mode(MODE2_OAM);
     check_ly_lyc();  // Need to check because LY was reset
 }
 
@@ -339,8 +348,8 @@ static void vblank_handler(){
 
 //mode in which ppu is after bootrom
 static void fake_vblank_hander(){
-    crapstate.ppu.mode= MODE2_OAM;
-    crapstate.ppu.mode_cycles =MODE2_OAM_CYCLES;
+    crapstate.ppu.mode = MODE2_OAM;
+    crapstate.ppu.mode_cycles = MODE2_OAM_CYCLES;
     check_ly_lyc(); //can fire right after bootrom
     set_lcd_mode(MODE2_OAM);
 }
@@ -366,7 +375,7 @@ static void (* const mode_change_handlers[])  (void) = {
     [MODE_FAKE_VBLANK] = fake_vblank_hander
 };
 
-
+//public stepping function 
 void update_ppu(uint16_t clocks){
 
     if(crapstate.ppu.mode == MODE_DISABLED){

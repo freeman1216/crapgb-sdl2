@@ -54,11 +54,11 @@
  * Everything else you can use however you see fit
  */
 
+#include <stdint.h>
+ 
 #include "cpu.h"
 #include "defines.h"
 #include "mem.h"
-#include <stdint.h>
-#include <sys/types.h>
 #include "crapstate.h"
 #include "cpu_instr.h"
 

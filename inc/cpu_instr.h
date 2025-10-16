@@ -30,8 +30,6 @@
 // CPU instructions code generation
 // 16-bit instr
 
-
-
 #define LD_R16_N16(dest)                                                       \
   crapstate.cpu.dest = mem_read_word(crapstate.cpu.pc + 1);                    \
   crapstate.cpu.pc += 3;                                                       \

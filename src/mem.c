@@ -1,7 +1,8 @@
-#include "mem.h"
-#include "defines.h"
 #include <stdint.h>
 #include <stdio.h>
+
+#include "mem.h"
+#include "defines.h"
 #include "crapstate.h"
 #include "ppu.h"
 
@@ -213,7 +214,6 @@ static void  inline io_write(uint16_t addr, uint8_t val) {
         case 0xFF40: {    
             uint8_t old_lcdc = crapstate.io.LCDC;
             crapstate.io.LCDC = val;
-
             if ((old_lcdc ^ val) & 0x80) {  
                 if (val & 0x80) {
                     start_ppu();
@@ -221,7 +221,9 @@ static void  inline io_write(uint16_t addr, uint8_t val) {
                     stop_ppu();
                 }
             }
-        }   break;
+            break;
+        }   
+            
         case 0xFF41: crapstate.io.STAT = (crapstate.io.STAT & 0x03) | (val & 0xFC); break;
         case 0xFF42: crapstate.io.SCY = val; break;
         case 0xFF43: crapstate.io.SCX = val; break;
@@ -234,7 +236,7 @@ static void  inline io_write(uint16_t addr, uint8_t val) {
                 crapstate.mem.oam[i]   = mem_read_byte(src + i);
             }
     
-            crapstate.cpu.cycles += 640;
+            crapstate.cpu.cycles += 640;//160 transfers * 4 ticks
             break;
         }
           
@@ -294,12 +296,14 @@ static inline uint8_t read_joypad() {
 }
 
 void flag_joypad_interrupt(joypad_part_t part){
+    
+
     if ((crapstate.io.P1 & JOYP_DPAD) ^ part) {
        REQUEST_INTERRUPT(INTERRUPT_JOYPAD);
     }
     
     
-    if ( (crapstate.io.P1 & JOYP_DPAD) ^ part) {
+    if ( (crapstate.io.P1 & JOYP_BUTTONS) ^ part) {
        REQUEST_INTERRUPT(INTERRUPT_JOYPAD);
     }
 }

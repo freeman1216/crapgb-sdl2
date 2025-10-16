@@ -18,9 +18,6 @@
 #include "defines.h"
 #include "mem.h"
 
-
-
-
 int main(int argc,char** argv ){
     if(argc<1){
         return -1;
@@ -46,7 +43,7 @@ int main(int argc,char** argv ){
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC);
     assert(renderer);
     
-    assert(SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255) == 0);
+    assert(SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255) == 0);
     assert(SDL_RenderClear(renderer) == 0);
     
     
