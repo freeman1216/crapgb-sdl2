@@ -91,7 +91,7 @@ static inline void __render_window(){
     uint8_t tb1 = crapstate.mem.vram[tile_index];
     uint8_t tb2 = crapstate.mem.vram[tile_index+1];
     tb1 >>= x_rem;
-    tb1 >>= x_rem;
+    tb2 >>= x_rem;
     uint8_t x_last = (crapstate.io.WX > 7 ? crapstate.io.WX - 7 : 0)-1 ;
     
     while(draw_x!=x_last)  {
