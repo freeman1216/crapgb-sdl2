@@ -1,7 +1,6 @@
 #include "crapstate.h"
 #include "defines.h"
-#include <stdint.h>
-#include <string.h>
+
 
 crapstate_t crapstate;
 
@@ -42,7 +41,7 @@ void crapstate_init() {
   crapstate.io.SCX = 0x00;   // SCX
   crapstate.io.STAT = 0x85;   // STAT (mode flag set)
   crapstate.io.BGP = 0xFC;   // BGP (default palette)
-
+  
   //rendrerer stuff
   crapstate.display.OBP_indeces[0][0] = 3;
   crapstate.display.OBP_indeces[0][1] = 3;
@@ -58,8 +57,8 @@ void crapstate_init() {
   crapstate.display.BGP_indeces[1] = 3;
   crapstate.display.BGP_indeces[2] = 3;
   crapstate.display.BGP_indeces[3] = 3;
-  crapstate.display.window_curr_line=0;
-  crapstate.display.vblank_counter =0;
+  crapstate.display.window_curr_line = 0;
+  crapstate.display.frame_finished = 0;
   crapstate.display.palette[0] = 0x7FFF;
   crapstate.display.palette[1] = 0x7E10;
   crapstate.display.palette[2] = 0x48E7;

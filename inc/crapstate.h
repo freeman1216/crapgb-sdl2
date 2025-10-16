@@ -100,7 +100,7 @@ typedef struct {
         uint8_t OBP_indeces[2][4];
         uint8_t BGP_indeces[4] ;
         uint8_t window_curr_line;
-        uint8_t vblank_counter;
+        uint8_t frame_finished;
 
     } display;
 
