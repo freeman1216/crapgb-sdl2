@@ -7,8 +7,9 @@ Passes blargg's instruction tests and [dmg-acid2](https://github.com/mattcurrie/
 
 * Full instruction set
 * Accurate timers
-* Kinda accurate PPU 
+* Kinda accurate PPU (with some timing issues)
 * Rendering is done by line so no mid scanline effects
+* Input polling is done once per frame so LY is the same every joypad interrupt
 * Only MBC1 is supported
 * No sound
 
