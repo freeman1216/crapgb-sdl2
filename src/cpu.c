@@ -2680,8 +2680,8 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.H = ((crapstate.cpu.sp & 0xF) + (offset & 0xF) > 0xF) ? 1 : 0;
             crapstate.cpu.C = ((crapstate.cpu.sp & 0xFF) + (offset & 0xFF) > 0xFF) ? 1 : 0;
             crapstate.cpu.sp += offset;
-            crapstate.cpu.pc+=2;
-            crapstate.cpu.cycles+=16;
+            crapstate.cpu.pc += 2;
+            crapstate.cpu.cycles += 16;
             
             break;
         }
