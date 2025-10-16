@@ -322,23 +322,23 @@ static inline void render_line(){
 
 static inline void check_ly_lyc() {
     if (crapstate.io.LY == crapstate.io.LYC) {
-        crapstate.io.STAT |= (1 << 2); 
-        if (crapstate.io.STAT & (1 << 6)) {
-            REQUEST_INTERRUPT(STAT_IF_BIT); 
+        crapstate.io.STAT |= STAT_LYC_MASK; 
+        if (crapstate.io.STAT & STAT_LYC_INT_ENABLE_MASK) {
+            REQUEST_INTERRUPT(INTERRUPT_STAT); 
         }
     } else {
         crapstate.io.STAT &= ~(1 << 2); // Clear coincidence flag
     }
 }
 
-static inline void set_lcd_mode(uint8_t mode) {
+static inline void set_lcd_mode(ppu_mode_t mode) {
     crapstate.io.STAT = (crapstate.io.STAT & ~0x03) | mode;
     crapstate.ppu.mode = mode;
     
     // Trigger STAT interrupt if enabled for this mode
     if (mode <= 2) {
         if (crapstate.io.STAT & (1 << (mode + 3))) {
-            REQUEST_INTERRUPT(STAT_IF_BIT); 
+            REQUEST_INTERRUPT(INTERRUPT_STAT); 
         }
     }
 }
@@ -367,7 +367,8 @@ static void hblank_handler(){
         crapstate.ppu.mode = MODE1_VBLANK;
         crapstate.ppu.mode_cycles = CYCLES_PER_SCANLINE;
         set_lcd_mode(MODE1_VBLANK);
-        
+        REQUEST_INTERRUPT(INTERRUPT_VBLANK);
+        crapstate.display.frame_finished=1;
     }
     crapstate.io.LY++;
 }

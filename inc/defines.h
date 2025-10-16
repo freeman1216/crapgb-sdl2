@@ -91,14 +91,13 @@ typedef enum {
 #define ATTR_PALLETE_MASK   (0x10)
 
 //interrupt defines
-#define INTERRUPT_VBLANK   0x01  // Bit 0
-#define INTERRUPT_STAT     0x02  // Bit 1
-#define INTERRUPT_TIMER    0x04  // Bit 2
-#define INTERRUPT_SERIAL   0x08  // Bit 3
-#define INTERRUPT_JOYPAD   0x10  // Bit 4
-#define STAT_IF_BIT     1  
-#define TIMA_IF_BIT     2
-#define VBLANK_IF_BIT   0
+#define REQUEST_INTERRUPT(mask)  crapstate.io.if_reg |= mask 
+#define INTERRUPT_VBLANK   (0x01)  // Bit 0
+#define INTERRUPT_STAT     (0x02)  // Bit 1
+#define INTERRUPT_TIMER    (0x04)  // Bit 2
+#define INTERRUPT_SERIAL   (0x08)  // Bit 3
+#define INTERRUPT_JOYPAD   (0x10)  // Bit 4
+
 // ==== Interrupt Vector Addresses (for jumps) ====
 #define VBLANK_VECTOR      0x0040
 #define STAT_VECTOR        0x0048

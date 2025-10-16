@@ -24,8 +24,8 @@ void update_timer(uint16_t cycles) {
         while (crapstate.timing.tima_cycles >= threshold) {
             crapstate.timing.tima_cycles -= threshold;
             if (crapstate.io.TIMA == 0xFF) {
-                crapstate.io.TIMA = crapstate.io.TMA; // TMA
-                crapstate.io.if_reg|= (1<<TIMA_IF_BIT); // Timer interrupt
+                crapstate.io.TIMA = crapstate.io.TMA; 
+                REQUEST_INTERRUPT(INTERRUPT_TIMER); 
             } else {
                 crapstate.io.TIMA++;
             }
