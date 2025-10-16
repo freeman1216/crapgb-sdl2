@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include "defines.h"
+#include "ppu.h"
 #include "stdio.h"
 
 #ifdef ENABLE_GRAPHICS
