@@ -7,10 +7,20 @@
 
 static void inline io_write(uint16_t addr, uint8_t val);
 static uint8_t inline io_read(uint16_t addr);
-void mem_init(FILE* rom){
-    uint32_t res =fread(crapstate.mem.rom0,1,ROM0_SIZE,rom);
+
+uint8_t mem_init(FILE* rom){
+    uint64_t res =fread(crapstate.mem.rom0,1,ROM0_SIZE,rom);
+    if(res != ROM0_SIZE) {
+        CRAPLOG("Bank 0 read incomplete! (%zu/%d bytes)\n", res, ROMX_SIZE);
+        return -1;
+    }
     res = fread(crapstate.mem.romx,1 , ROMX_SIZE, rom);
+    if(res != ROMX_SIZE) {
+        CRAPLOG("Bank 1 read incomplete! (%zu/%d bytes)\n", res, ROMX_SIZE);
+        return -1;
+    }
     crapstate.mem.rom = rom;
+    return 0;
 }
 
 uint8_t mem_read_byte(uint16_t addr){
@@ -57,7 +67,7 @@ uint8_t mem_read_byte(uint16_t addr){
             }
 
             if(addr < IOREGS_START){
-                return 0x00;
+                return 0xFF;
             }
 
             if (addr < HRAM_START) {
@@ -83,24 +93,24 @@ uint16_t mem_read_word(uint16_t addr) {
 }
 
 void handle_bank_switch(uint8_t value) {
-    // Validate bank number (0 becomes 1)
-    uint8_t bank = value & 0x1F;  // MBC1 uses 5 bits
+    
+    uint8_t bank = value & 0x1F;  
     if(bank == 0) bank = 1;
     
 
     if(bank != crapstate.mem.currentromx) {
         if(fseek(crapstate.mem.rom, ROMX_SIZE * (bank), SEEK_SET) != 0) {
-            printf("Bank seek failed!\n");
+            CRAPLOG("Bank seek failed!\n");
             return;
         }
         
         size_t read = fread(crapstate.mem.romx, 1, ROMX_SIZE, crapstate.mem.rom);
         if(read != ROMX_SIZE) {
-            printf("Bank read incomplete! (%zu/%d bytes)\n", read, ROMX_SIZE);
+            CRAPLOG("Bank read incomplete! (%zu/%d bytes)\n", read, ROMX_SIZE);
         }
         
         crapstate.mem.currentromx = bank;
-       // printf("Switched to ROM bank %d\n", bank);
+       // CRAPLOG("Switched to ROM bank %d\n", bank);
     }
 }
 
@@ -182,13 +192,13 @@ static void  inline io_write(uint16_t addr, uint8_t val) {
     switch (addr) {
         // Joypad
         case 0xFF00: 
-            crapstate.io.P1 = (crapstate.io.P1 & 0xCF) | (val & 0x30);
+            crapstate.io.P1 = (crapstate.io.P1 & 0xCF) | (val & 0x30); //bits 4 and 5 writable
             break;
             
-        // Serial
+        // Serial (for testing with roms that write to it)
         case 0xFF01: {
             crapstate.io.SB = val;
-            printf("%c",val);
+            CRAPLOG("%c",val);
             break;
         }
         case 0xFF02: crapstate.io.SC = val & 0x83; break; // Only bits 0-1,7 writable
@@ -204,7 +214,7 @@ static void  inline io_write(uint16_t addr, uint8_t val) {
             uint8_t old_lcdc = crapstate.io.LCDC;
             crapstate.io.LCDC = val;
 
-            if ((old_lcdc ^ val) & 0x80) {  // Only if enable bit changed
+            if ((old_lcdc ^ val) & 0x80) {  
                 if (val & 0x80) {
                     start_ppu();
                 } else {
@@ -258,14 +268,14 @@ static void  inline io_write(uint16_t addr, uint8_t val) {
         // Interrupts
         case 0xFF0F: crapstate.io.if_reg = val & 0x1F; break;
             
-        default: break; // Ignore writes to unused
+        default: break; 
     }
 }
 static inline uint8_t read_joypad() {
     uint8_t result = 0xF;  // Default: no buttons pressed
     
     // Check direction buttons (if P1.4=0)
-    if (!(crapstate.io.P1 & 0x10)) {
+    if (!(crapstate.io.P1 & JOYP_DPAD)) {
         if (crapstate.buttons.right)  result &= ~(1 << 0);
         if (crapstate.buttons.left)   result &= ~(1 << 1);
         if (crapstate.buttons.up)     result &= ~(1 << 2);
@@ -273,7 +283,7 @@ static inline uint8_t read_joypad() {
     }
     
     // Check action buttons (if P1.5=0)
-    if (!(crapstate.io.P1 & 0x20)) {
+    if (!(crapstate.io.P1 & JOYP_BUTTONS)) {
         if (crapstate.buttons.A)      result &= ~(1 << 0);
         if (crapstate.buttons.B)      result &= ~(1 << 1);
         if (crapstate.buttons.start)  result &= ~(1 << 2);
@@ -281,6 +291,17 @@ static inline uint8_t read_joypad() {
     }
     
     return (crapstate.io.P1 & 0xF0) | result;
+}
+
+void flag_joypad_interrupt(joypad_part_t part){
+    if ((crapstate.io.P1 & JOYP_DPAD) ^ part) {
+       REQUEST_INTERRUPT(INTERRUPT_JOYPAD);
+    }
+    
+    
+    if ( (crapstate.io.P1 & JOYP_DPAD) ^ part) {
+       REQUEST_INTERRUPT(INTERRUPT_JOYPAD);
+    }
 }
 
 static uint8_t inline io_read(uint16_t addr) {
