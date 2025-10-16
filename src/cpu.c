@@ -49,6 +49,8 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
  * IN THE SOFTWARE.
+ *
+ *
  * Everything else you can use however you see fit
  */
 
@@ -56,7 +58,6 @@
 #include "defines.h"
 #include "mem.h"
 #include <stdint.h>
-#include <stdio.h>
 #include <sys/types.h>
 #include "crapstate.h"
 #include "cpu_instr.h"
@@ -96,7 +97,7 @@ static inline void opcodes_cb(uint8_t postfix){
             crapstate.cpu.Z = !byte;
 
             crapstate.cpu.cycles+=8;
-            //printf("rotate byte at hl%x left \n %x",byte, crapstate.cpu.C);
+            
             break;
         }
         
@@ -136,7 +137,7 @@ static inline void opcodes_cb(uint8_t postfix){
             crapstate.cpu.Z = !byte;  
             mem_write_byte(crapstate.cpu.hl, byte);
             crapstate.cpu.cycles+=8;
-            //printf("rotate byte at hl %x right  %x,c %x\n",crapstate.cpu.hl, byte, crapstate.cpu.C);
+            
             break;
         }
         
@@ -178,7 +179,7 @@ static inline void opcodes_cb(uint8_t postfix){
             mem_write_byte(crapstate.cpu.hl, byte);
             crapstate.cpu.Z = !byte;
             crapstate.cpu.cycles+=8;
-            //printf("rotated b through carry res %x c %x",byte, crapstate.cpu.C);
+            
             break;
         }
         
@@ -219,7 +220,7 @@ static inline void opcodes_cb(uint8_t postfix){
             byte |= (old_carry<<7);
             crapstate.cpu.Z = !byte;
             mem_write_byte(crapstate.cpu.hl, byte);
-            //printf("rotated byte %x at addr %x right through carry  z %x c %x\n",byte,crapstate.cpu.hl,crapstate.cpu.Z,crapstate.cpu.C);
+            
             crapstate.cpu.cycles+=8;
             break;
         }
@@ -1155,7 +1156,7 @@ static inline void opcodes_cb(uint8_t postfix){
         
         default:{
             
-            printf("unhandled cb postcode %x\n",postfix);
+            CRAPLOG("unreachable,something went terribly wrong if you reached this");
             while(1);
         }
     }
@@ -1164,7 +1165,7 @@ static inline void opcodes_cb(uint8_t postfix){
 static void opcodes(uint8_t opcode){
     switch (opcode) {
         case 0x00:{// NOP
-            //printf("got nop\n");
+            
             crapstate.cpu.pc++;
             crapstate.cpu.cycles+=4;
             break;
@@ -1177,7 +1178,7 @@ static void opcodes(uint8_t opcode){
             mem_write_byte(crapstate.cpu.bc,crapstate.cpu.a);
             crapstate.cpu.pc++;
             crapstate.cpu.cycles+=8;
-            //printf("loaded a %x to memory addr %x from bc\n",crapstate.cpu.a,crapstate.cpu.bc);
+            
             break;  
         }
         case 0x03:{ // INC BC
@@ -1203,7 +1204,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.Z = 0;  // Unlike RLC A, Z is always 0 in RLCA!
             crapstate.cpu.H = 0;
             crapstate.cpu.N = 0;
-            //printf("rotate a left a %x,c %x\n", crapstate.cpu.a, crapstate.cpu.C);
+            
             crapstate.cpu.pc++;
             crapstate.cpu.cycles+=4;
             break;
@@ -1214,7 +1215,7 @@ static void opcodes(uint8_t opcode){
             mem_write_word(addr,crapstate.cpu.sp);
             crapstate.cpu.pc+=3;
             crapstate.cpu.cycles+=20;
-            //printf("loaded sp %x to %x\n",crapstate.cpu.sp,addr);
+            
             break;
         }
         
@@ -1226,13 +1227,13 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.C = ((uint32_t)old_hl + (uint32_t)crapstate.cpu.bc) > 0xFFFF;
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 8;
-            //printf("added bc %x to hl %x res %x flags  h%x c%x\n", crapstate.cpu.bc,old_hl, crapstate.cpu.hl, crapstate.cpu.H, crapstate.cpu.C);
+            
             break;
         }
         
         case 0x0A: { // LD A, (BC)
             crapstate.cpu.a = mem_read_byte(crapstate.cpu.bc);
-            //printf("read %x byte to a pointed by bc at addr %x\n", crapstate.cpu.a, crapstate.cpu.bc);
+            
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 8;
             break;
@@ -1262,7 +1263,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.H = 0;
             crapstate.cpu.pc++;
             crapstate.cpu.cycles+=4;
-            //printf("rotated a right a %x, c%x \n",crapstate.cpu.a,crapstate.cpu.C);
+            
             break;
         }
         
@@ -1270,7 +1271,7 @@ static void opcodes(uint8_t opcode){
             //STOP NYI
             UNHANDLED_OPCODE();
         }
-        
+
         case 0x11:{//LD DE, n16
             LD_R16_N16(de);
         }
@@ -1279,7 +1280,7 @@ static void opcodes(uint8_t opcode){
             mem_write_byte(crapstate.cpu.de, crapstate.cpu.a);
             crapstate.cpu.pc++;
             crapstate.cpu.cycles+=8;
-            //printf("wrote %x from a to byte %x pointed by de\n",crapstate.cpu.a,crapstate.cpu.de );
+            
             break;
         }
         
@@ -1307,7 +1308,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.H = 0;
             crapstate.cpu.Z = 0;
             crapstate.cpu.N = 0;
-            //printf("rotated a through carry res %x c %x",crapstate.cpu.a, crapstate.cpu.C);
+            
             crapstate.cpu.pc+=1;
             crapstate.cpu.cycles+=4;
             break;
@@ -1316,7 +1317,7 @@ static void opcodes(uint8_t opcode){
         case 0x18:{ // JR
             int8_t offset = (int8_t)mem_read_byte(crapstate.cpu.pc+1);
             crapstate.cpu.pc = crapstate.cpu.pc+2+offset;
-            //printf("jumping relatively to %x\n",crapstate.cpu.pc);
+            
             crapstate.cpu.cycles+=12;
             break;
         }
@@ -1329,13 +1330,13 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.C = ((uint32_t)old_hl + (uint32_t)crapstate.cpu.de) > 0xFFFF;
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 8;
-            //printf("added de %x to hl %x res %x flags  h%x c%x\n", crapstate.cpu.de,old_hl, crapstate.cpu.hl, crapstate.cpu.H, crapstate.cpu.C);
+            
             break;
         }
         
         case 0x1A: { // LD A, (DE)
             crapstate.cpu.a = mem_read_byte(crapstate.cpu.de);
-            //printf("read %x byte to a pointed by de at addr %x\n", crapstate.cpu.a, crapstate.cpu.de);
+            
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 8;
             break;
@@ -1363,7 +1364,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.C = (crapstate.cpu.a) & 0x1 ;
             crapstate.cpu.a >>= 1;
             crapstate.cpu.a |= (old_carry<<7);
-            //printf("rotated a right through carry res %x c %x\n",crapstate.cpu.a, crapstate.cpu.C);
+            
             crapstate.cpu.pc+=1;
             crapstate.cpu.cycles+=4;
             break;
@@ -1374,7 +1375,7 @@ static void opcodes(uint8_t opcode){
             if(!crapstate.cpu.Z){
                 int8_t offset = (int8_t)mem_read_byte(crapstate.cpu.pc+1);
                 crapstate.cpu.pc = crapstate.cpu.pc+2+offset;
-                //printf("Z flag not set jumping to %x\n",crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles+=12;
             }else{
                 crapstate.cpu.pc+=2;
@@ -1390,7 +1391,7 @@ static void opcodes(uint8_t opcode){
             mem_write_byte(crapstate.cpu.hl, crapstate.cpu.a);
             crapstate.cpu.hl++;
             crapstate.cpu.pc++;
-            //printf("loaded from a to hl %x and incremented %x\n",crapstate.cpu.a,crapstate.cpu.hl);
+            
             crapstate.cpu.cycles+=8;
             break;
         }
@@ -1436,7 +1437,7 @@ static void opcodes(uint8_t opcode){
             if ((a & 0x100) == 0x100){
                 crapstate.cpu.C= 1;
             }
-            //printf("daa a%x res %x \n",crapstate.cpu.a,a);
+            
             crapstate.cpu.a = a;
             crapstate.cpu.Z = (crapstate.cpu.a == 0);
             crapstate.cpu.H = 0;
@@ -1450,7 +1451,7 @@ static void opcodes(uint8_t opcode){
             if(crapstate.cpu.Z){
                 int8_t offset = (int8_t)mem_read_byte(crapstate.cpu.pc+1);
                 crapstate.cpu.pc = crapstate.cpu.pc+2+offset;
-                //printf("Z flag set jumping to %x\n",crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles+=12;
             }else{
                 crapstate.cpu.pc+=2;
@@ -1467,13 +1468,13 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.C = ((uint32_t)old_hl + (uint32_t)old_hl) > 0xFFFF;
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 8;
-            //printf("added hl %x to hl res %x flags  h%x c%x\n", old_hl, crapstate.cpu.hl, crapstate.cpu.H, crapstate.cpu.C);
+            
             break;
         }
         
         case 0x2A: { // LD A, (HL+)
             crapstate.cpu.a = mem_read_byte(crapstate.cpu.hl);
-            //printf("read %x byte to a pointed by hl at addr and incremented hl %x\n", crapstate.cpu.a, crapstate.cpu.hl);
+            
             crapstate.cpu.hl++;
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 8;
@@ -1502,7 +1503,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.N = 1;
             crapstate.cpu.pc++;
             crapstate.cpu.cycles+=4;
-            //printf("negated a %x\n",crapstate.cpu.a);
+            
             break;
         }
         
@@ -1511,7 +1512,7 @@ static void opcodes(uint8_t opcode){
             if(!crapstate.cpu.C){
                 int8_t offset = (int8_t)mem_read_byte(crapstate.cpu.pc+1);
                 crapstate.cpu.pc = crapstate.cpu.pc+2+offset;
-                //printf("C flag not set jumping to %x\n",crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles+=12;
             }else{
                 crapstate.cpu.pc+=2;
@@ -1528,7 +1529,7 @@ static void opcodes(uint8_t opcode){
             mem_write_byte(crapstate.cpu.hl, crapstate.cpu.a);
             crapstate.cpu.hl--;
             crapstate.cpu.pc++;
-            //printf("loaded from a to hl %x and decremented %x\n",crapstate.cpu.a,crapstate.cpu.hl);
+            
             crapstate.cpu.cycles+=8;
             break;
         }
@@ -1547,7 +1548,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.H = ((val & 0xF) + 1 > 0xF);
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 12;
-            //printf("incremented a byte at hl %x res %x\n",crapstate.cpu.hl,result);
+            
             
             break;
         }
@@ -1562,7 +1563,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.N = 1;
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 12;
-            //printf("dec a byte at hl %x res %x\n",crapstate.cpu.hl,result);
+            
             
             break;
         }
@@ -1572,7 +1573,7 @@ static void opcodes(uint8_t opcode){
             mem_write_byte(crapstate.cpu.hl, byte);
             crapstate.cpu.pc+=2;
             crapstate.cpu.cycles+=12;
-            //printf("wrote byte %x to addr%x\n",byte,crapstate.cpu.hl);
+            
             break;
         }
         
@@ -1582,7 +1583,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.H = 0;
             crapstate.cpu.pc++;
             crapstate.cpu.cycles+=4;
-            //printf("set carry flag\n");
+            
             break;
         }
         
@@ -1590,7 +1591,7 @@ static void opcodes(uint8_t opcode){
             if(crapstate.cpu.C){
                 int8_t offset = (int8_t)mem_read_byte(crapstate.cpu.pc+1);
                 crapstate.cpu.pc = crapstate.cpu.pc+2+offset;
-                //printf("C flag set jumping to %x\n",crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles+=12;
             }else{
                 crapstate.cpu.pc+=2;
@@ -1607,13 +1608,13 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.C = ((uint32_t)old_hl + (uint32_t)crapstate.cpu.sp) > 0xFFFF;
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 8;
-            //printf("added sp %x to hl %x res %x flags  h%x c%x\n", crapstate.cpu.sp,old_hl, crapstate.cpu.hl, crapstate.cpu.H, crapstate.cpu.C);
+            
             break;
         }
         
         case 0x3A: { // LD A, HLD
             crapstate.cpu.a = mem_read_byte(crapstate.cpu.hl);
-            //printf("read %x byte to a pointed by hl at addr and decremented hl %x\n", crapstate.cpu.a, crapstate.cpu.hl);
+            
             crapstate.cpu.hl--;
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 8;
@@ -1641,7 +1642,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.N = 0;
             crapstate.cpu.H = 0;
             crapstate.cpu.pc++;
-            //printf("inverted carry flag %x\n", crapstate.cpu.C);
+            
             crapstate.cpu.cycles += 4;
             break;
         }
@@ -1880,7 +1881,7 @@ static void opcodes(uint8_t opcode){
                     crapstate.cpu.cycles = tima_cycles;
                 }
             }
-            //printf("halted\n");
+            
             break;
         }
         
@@ -1888,7 +1889,7 @@ static void opcodes(uint8_t opcode){
             mem_write_byte(crapstate.cpu.hl,crapstate.cpu.a);
             crapstate.cpu.pc++;
             crapstate.cpu.cycles+=8;
-            //printf("loaded a %x to memory addr %x from hl\n",crapstate.cpu.a,crapstate.cpu.hl);
+            
             break;
         }
         
@@ -1958,7 +1959,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.C = old_a > crapstate.cpu.a;
             crapstate.cpu.pc+=1;
             crapstate.cpu.cycles += 8;
-            //printf("added byte %x at addr %x to a %x res %x flags z%x h%x c%x\n", byte, crapstate.cpu.hl , old_a, crapstate.cpu.a, crapstate.cpu.Z, crapstate.cpu.H, crapstate.cpu.C);
+            
             break;
         }
         
@@ -2003,7 +2004,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.C = (result > 0xFF);        
             crapstate.cpu.pc+=1;
             crapstate.cpu.cycles += 8;
-            //printf("added byte %x with carry %x at addr %x to a %x res %x flags z%x h%x c%x\n",value,crapstate.cpu.C ,crapstate.cpu.hl , old_a, crapstate.cpu.a, crapstate.cpu.Z, crapstate.cpu.H, crapstate.cpu.C);
+            
             break;
             
         }
@@ -2045,7 +2046,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.N = 1;
             crapstate.cpu.cycles+=8;
             crapstate.cpu.pc+=1;
-            //printf("sub a %x to %x ,res z%x c%x, h%x\n",crapstate.cpu.a,subval,crapstate.cpu.Z,crapstate.cpu.C,crapstate.cpu.H);
+            
             break;
         }
         
@@ -2057,7 +2058,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.N = 1;
             crapstate.cpu.cycles+=4;
             crapstate.cpu.pc+=1;
-            //printf("sub a a\n");
+            
             break;
         }
         
@@ -2135,7 +2136,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.N = 0;
             crapstate.cpu.C = 0;
             crapstate.cpu.Z = !crapstate.cpu.a;
-            //printf("anded a and byte [hl]%X res %x\n",byte, crapstate.cpu.a);
+            
             crapstate.cpu.pc += 1;
             crapstate.cpu.cycles += 8;
             break;
@@ -2146,7 +2147,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.N = 0;
             crapstate.cpu.C = 0;
             crapstate.cpu.Z = !crapstate.cpu.a;
-            //printf("anded a and a res %x\n", crapstate.cpu.a);
+            
             crapstate.cpu.pc += 1;
             crapstate.cpu.cycles += 4;
             break;
@@ -2184,7 +2185,7 @@ static void opcodes(uint8_t opcode){
 
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 8;
-            //printf("xored a  with byte at hl %x res%x \n",byte ,crapstate.cpu.a);
+            
             break;
         }
         
@@ -2194,7 +2195,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.Z = 1;
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 4;
-            //printf("xored a\n");
+            
             break;
         }
         
@@ -2229,7 +2230,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.Z = !crapstate.cpu.a;
             crapstate.cpu.pc+=1;
             crapstate.cpu.cycles += 8;
-            //printf("ored a and byte [hl] %X result %x\n",byte, crapstate.cpu.a);
+            
             break;
         }
         
@@ -2238,7 +2239,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.Z = !crapstate.cpu.a;
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 4;
-            //printf("ored a and a result %x\n", crapstate.cpu.a);
+            
             break;
         }
         
@@ -2275,7 +2276,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.H = (crapstate.cpu.a & 0x0F) < (cpval & 0x0F);
             crapstate.cpu.cycles+=8;
             crapstate.cpu.pc+=1;
-            //printf("cp a hl %x to %x ,res z%x c%x, h%x\n",crapstate.cpu.a,cpval,crapstate.cpu.Z,crapstate.cpu.C,crapstate.cpu.H);
+            
             break;
         }
         
@@ -2285,7 +2286,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.N = 1;
             crapstate.cpu.pc++;
             crapstate.cpu.cycles+=4;
-            //printf("cp a ,a\n");
+            
             break;
         }
         
@@ -2294,7 +2295,7 @@ static void opcodes(uint8_t opcode){
                 uint8_t low = mem_read_byte(crapstate.cpu.sp++);
                 uint8_t high = mem_read_byte(crapstate.cpu.sp++);
                 crapstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
-                //printf("returning to %x\n", crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles += 20;
             } else {
                 crapstate.cpu.pc++;
@@ -2311,7 +2312,7 @@ static void opcodes(uint8_t opcode){
             //JP NZ
             if(!crapstate.cpu.Z){
                 crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc+1);
-                //printf("Z flag not set jumping to %x\n",crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles+=16;
             }else{
                 crapstate.cpu.pc+=3;
@@ -2322,7 +2323,7 @@ static void opcodes(uint8_t opcode){
         
         case 0xC3: { // JP nn
             crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc + 1);
-            //printf("jump to %x\n", crapstate.cpu.pc);
+            
             crapstate.cpu.cycles += 16;
             break;
         }
@@ -2333,9 +2334,9 @@ static void opcodes(uint8_t opcode){
                 mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) >> 8); // High byte
                 crapstate.cpu.sp--;
                 mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) & 0xFF); // Low byte
-                //printf("stored %x%x\n", (crapstate.cpu.pc + 3) >> 8, (crapstate.cpu.pc + 3) & 0xFF);
+                
                 crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc + 1);
-                //printf("calling to %x because NZ\n", crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles += 24;
             } else {
                 crapstate.cpu.pc+=3;
@@ -2358,7 +2359,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.C = old_a > crapstate.cpu.a;
             crapstate.cpu.pc+=2;
             crapstate.cpu.cycles += 8;
-            //printf("added byte %x to a %x res %x flags z%x h%x c%x\n", byte, old_a, crapstate.cpu.a, crapstate.cpu.Z, crapstate.cpu.H, crapstate.cpu.C);
+            
             break;
         }
         
@@ -2371,7 +2372,7 @@ static void opcodes(uint8_t opcode){
                 uint8_t low = mem_read_byte(crapstate.cpu.sp++);
                 uint8_t high = mem_read_byte(crapstate.cpu.sp++);
                 crapstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
-                //printf("returning to %x\n", crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles += 20;
             } else {
                 crapstate.cpu.pc++;
@@ -2384,7 +2385,7 @@ static void opcodes(uint8_t opcode){
             uint8_t low = mem_read_byte(crapstate.cpu.sp++);
             uint8_t high = mem_read_byte(crapstate.cpu.sp++);
             crapstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
-            //printf("returning to %x\n", crapstate.cpu.pc);
+            
             crapstate.cpu.cycles += 16;
             break;
         }
@@ -2392,7 +2393,7 @@ static void opcodes(uint8_t opcode){
         case 0xCA:  { //JP Z
             if(crapstate.cpu.Z){
                 crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc+1);
-                //printf("Z flag set jumping to %x\n",crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles+=16;
             }else{
                 crapstate.cpu.pc+=3;
@@ -2414,9 +2415,9 @@ static void opcodes(uint8_t opcode){
                 mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) >> 8); // High byte
                 crapstate.cpu.sp--;
                 mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) & 0xFF); // Low byte
-                //printf("stored %x%x\n", (crapstate.cpu.pc + 3) >> 8, (crapstate.cpu.pc + 3) & 0xFF);
+                
                 crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc + 1);
-                //printf("calling to %x because Z\n", crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles += 24;
             } else {
                 crapstate.cpu.pc+=3;
@@ -2430,9 +2431,9 @@ static void opcodes(uint8_t opcode){
             mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) >> 8); // High byte
             crapstate.cpu.sp--;
             mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) & 0xFF); // Low byte
-            //printf("stored %x%x\n", (crapstate.cpu.pc + 3) >> 8, (crapstate.cpu.pc + 3) & 0xFF);
+            
             crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc + 1);
-            //printf("calling to %x\n", crapstate.cpu.pc);
+            
             crapstate.cpu.cycles += 24;
             break;
         }
@@ -2450,7 +2451,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.C = (result > 0xFF);        // 1
             crapstate.cpu.pc+=2;
             crapstate.cpu.cycles += 8;
-            //printf("added byte %x with carry  %x to a %x res %x flags z%x h%x c%x\n",byte,crapstate.cpu.C , old_a, crapstate.cpu.a, crapstate.cpu.Z, crapstate.cpu.H, crapstate.cpu.C);
+            
             break;
             
         }
@@ -2465,7 +2466,7 @@ static void opcodes(uint8_t opcode){
                 uint8_t low = mem_read_byte(crapstate.cpu.sp++);
                 uint8_t high = mem_read_byte(crapstate.cpu.sp++);
                 crapstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
-                //printf("returning to %x\n", crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles += 20;
             } else {
                 crapstate.cpu.pc++;
@@ -2482,7 +2483,7 @@ static void opcodes(uint8_t opcode){
             //JP NC
             if(!crapstate.cpu.C){
                 crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc+1);
-                //printf("c flag not set jumping to %x\n",crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles+=16;
             }else{
                 crapstate.cpu.pc+=3;
@@ -2495,16 +2496,16 @@ static void opcodes(uint8_t opcode){
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-        
+
         case 0xD4: { // CALL NC
             if (!crapstate.cpu.C) {
                 crapstate.cpu.sp--;
                 mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) >> 8); // High byte
                 crapstate.cpu.sp--;
                 mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) & 0xFF); // Low byte
-                //printf("stored %x%x\n", (crapstate.cpu.pc + 3) >> 8, (crapstate.cpu.pc + 3) & 0xFF);
+                
                 crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc + 1);
-                //printf("calling to %x because NC\n", crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles += 24;
             } else {
                 crapstate.cpu.pc+=3;
@@ -2527,7 +2528,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.N = 1;
             crapstate.cpu.cycles+=8;
             crapstate.cpu.pc+=2;
-            //printf("sub a %x to %x ,res z%x c%x, h%x\n",crapstate.cpu.a,subval,crapstate.cpu.Z,crapstate.cpu.C,crapstate.cpu.H);
+            
             break;
         }
         
@@ -2540,7 +2541,7 @@ static void opcodes(uint8_t opcode){
                 uint8_t low = mem_read_byte(crapstate.cpu.sp++);
                 uint8_t high = mem_read_byte(crapstate.cpu.sp++);
                 crapstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
-                //printf("returning to %x\n", crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles += 20;
             } else {
                 crapstate.cpu.pc++;
@@ -2553,7 +2554,7 @@ static void opcodes(uint8_t opcode){
             uint8_t low = mem_read_byte(crapstate.cpu.sp++);
             uint8_t high = mem_read_byte(crapstate.cpu.sp++);
             crapstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
-            //printf("returning to %x and enabling interrupts\n", crapstate.cpu.pc);
+            
             crapstate.cpu.ime = 1;
             crapstate.cpu.cycles += 16;
             break;
@@ -2563,7 +2564,7 @@ static void opcodes(uint8_t opcode){
             //JP C
             if(crapstate.cpu.C){
                 crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc+1);
-                //printf("C flag set jumping to %x\n",crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles+=16;
             }else{
                 crapstate.cpu.pc+=3;
@@ -2576,16 +2577,16 @@ static void opcodes(uint8_t opcode){
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-        
+
         case 0xDC:  {//CALL C
             if (crapstate.cpu.C) {
                 crapstate.cpu.sp--;
                 mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) >> 8); // High byte
                 crapstate.cpu.sp--;
                 mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) & 0xFF); // Low byte
-                //printf("stored %x%x\n", (crapstate.cpu.pc + 3) >> 8, (crapstate.cpu.pc + 3) & 0xFF);
+                
                 crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc + 1);
-                //printf("calling to %x because C\n", crapstate.cpu.pc);
+                
                 crapstate.cpu.cycles += 24;
             } else {
                 crapstate.cpu.pc+=3;
@@ -2598,7 +2599,7 @@ static void opcodes(uint8_t opcode){
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-        
+
         case 0xDF:  {//RST 18H
             RST(0x18);
         }
@@ -2615,14 +2616,14 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.N = 1;
             crapstate.cpu.pc +=2;
             crapstate.cpu.cycles+=8;
-            //printf("sbc a n8, res %x c%x z%x h%x\n",crapstate.cpu.a, crapstate.cpu.C,crapstate.cpu.Z,crapstate.cpu.H);
+            
             break;
         }
         
         case 0xE0: { // LDH (n), A
             uint16_t addr = 0xFF00 + mem_read_byte(crapstate.cpu.pc + 1);
             mem_write_byte(addr, crapstate.cpu.a);
-            //printf("wrote a = %x to mem %x\n", crapstate.cpu.a, addr);
+            
             crapstate.cpu.pc += 2;
             crapstate.cpu.cycles += 12;
             break;
@@ -2635,7 +2636,7 @@ static void opcodes(uint8_t opcode){
         case 0xE2: { //LDH [C],A
             uint16_t addr = 0xFF00 + crapstate.cpu.c;
             mem_write_byte(addr, crapstate.cpu.a);
-            //printf("wrote a = %x to mem %x\n", crapstate.cpu.a, addr);
+            
             crapstate.cpu.pc += 1;
             crapstate.cpu.cycles += 8;
             break;
@@ -2650,7 +2651,7 @@ static void opcodes(uint8_t opcode){
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-        
+
         case 0xE5: { // PUSH HL
             PUSH_R16(h, l);
         }
@@ -2661,7 +2662,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.f = 0;
             crapstate.cpu.H = 1;
             crapstate.cpu.Z = !crapstate.cpu.a;
-            //printf("anded a and %x res %x\n", val, crapstate.cpu.a);
+            
             crapstate.cpu.pc += 2;
             crapstate.cpu.cycles += 8;
             break;
@@ -2681,21 +2682,21 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.sp += offset;
             crapstate.cpu.pc+=2;
             crapstate.cpu.cycles+=16;
-            //printf("added sp %x+offset %x (%x) ,H%x, C%x\n",crapstate.cpu.sp,offset,crapstate.cpu.sp,crapstate.cpu.H,crapstate.cpu.C);
+            
             break;
         }
         
         case 0xE9: { // JP HL
             crapstate.cpu.pc = crapstate.cpu.hl;
-            //printf("jump to hl %x\n", crapstate.cpu.pc);
+            
             crapstate.cpu.cycles += 4;
             break;
         }
-        
+
         case 0xEA: { // LD (nn), A
             uint16_t addr = mem_read_word(crapstate.cpu.pc + 1);
             mem_write_byte(addr, crapstate.cpu.a);
-            //printf("wrote %x from a to %x \n", crapstate.cpu.a, addr);
+            
             crapstate.cpu.pc += 3;
             crapstate.cpu.cycles += 16;
             break;
@@ -2715,7 +2716,7 @@ static void opcodes(uint8_t opcode){
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-        
+
         case 0xEE:  { //XOR A, n8
             uint8_t byte  = mem_read_byte(crapstate.cpu.pc+1);
             crapstate.cpu.a ^= byte;
@@ -2723,7 +2724,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.Z = !crapstate.cpu.a; 
             crapstate.cpu.pc+=2;
             crapstate.cpu.cycles+=8;
-            //printf("xored a with %x res %x\n",byte,crapstate.cpu.a);
+            
             break;
         }
         
@@ -2735,7 +2736,7 @@ static void opcodes(uint8_t opcode){
         case 0xF0: { // LDH A, (n)
             uint16_t addr = 0xFF00 + mem_read_byte(crapstate.cpu.pc + 1);
             crapstate.cpu.a = mem_read_byte(addr);
-            //printf("wrote to a = %x from mem %x\n", crapstate.cpu.a, addr);
+            
             crapstate.cpu.pc += 2;
             crapstate.cpu.cycles += 12;
             break;
@@ -2747,14 +2748,14 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.af = (uint16_t)(low & 0xf0) | ((uint16_t)high << 8);
             crapstate.cpu.pc++;
             crapstate.cpu.cycles+=12;
-            //printf("popped af = %x\n",crapstate.cpu.af);
+            
             break;
         }
         
         case 0xF2: { //LDH A, [C]
             uint16_t addr = 0xFF00 + crapstate.cpu.c;
             crapstate.cpu.a = mem_read_byte(addr);
-            //printf("wrote a = %x from mem %x\n", crapstate.cpu.a, addr);
+            
             crapstate.cpu.pc += 1;
             crapstate.cpu.cycles += 8;
             break;
@@ -2764,7 +2765,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.ime = 0;
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 4;
-            //printf("disabled interrupts\n");
+            
             break;
         }
         
@@ -2772,13 +2773,13 @@ static void opcodes(uint8_t opcode){
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-        
+
         case 0xF5: { // PUSH AF
             crapstate.cpu.sp--;
             mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.af) >> 8); // High byte
             crapstate.cpu.sp--;
             mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.af) & 0xFF); // Low byte
-            //printf("pushed af %x%x\n", (crapstate.cpu.af) >> 8, crapstate.cpu.af & 0xFF);
+            
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 16;
             break;
@@ -2791,7 +2792,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.Z = !crapstate.cpu.a;
             crapstate.cpu.pc+=2;
             crapstate.cpu.cycles += 8;
-            //printf("ored a and byte %X result %x\n",byte, crapstate.cpu.a);
+            
             break;
         }
         
@@ -2810,9 +2811,6 @@ static void opcodes(uint8_t opcode){
             ((crapstate.cpu.sp & 0xFF) + (offset & 0xFF) > 0xFF) ? 1 : 0;
             crapstate.cpu.pc += 2;
             crapstate.cpu.cycles += 12;
-            //printf("loaded sp %x+offset %x (%x) to hl,H%x, C%x\n",
-            //crapstate.cpu.sp, offset, crapstate.cpu.hl, crapstate.cpu.H,
-            //crapstate.cpu.C);
             
             break;
         }
@@ -2821,7 +2819,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.sp = crapstate.cpu.hl;
             crapstate.cpu.pc+=1;
             crapstate.cpu.cycles+=8;
-            //printf("loaded hl to sp %x\n",crapstate.cpu.sp);
+            
             break;
         }
         
@@ -2830,7 +2828,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.a = mem_read_byte(addr);
             crapstate.cpu.pc+=3;
             crapstate.cpu.cycles+=16;
-            //printf("wrote a = %x from addr %x\n",crapstate.cpu.a,addr);
+            
             break;
         }
         
@@ -2838,7 +2836,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.ime_pending = 1;
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 4;
-            //printf("enabled interrupts\n");
+            
             break;
         }
         
@@ -2851,7 +2849,7 @@ static void opcodes(uint8_t opcode){
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-        
+
         case 0xFE: { //CP A N8
             uint8_t cpval = mem_read_byte(crapstate.cpu.pc+1);
             uint8_t res = crapstate.cpu.a - cpval;
@@ -2861,7 +2859,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.H = (crapstate.cpu.a & 0x0F) < (cpval & 0x0F);
             crapstate.cpu.cycles+=8;
             crapstate.cpu.pc+=2;
-            //printf("cp a %x to %x ,res z%x c%x, h%x\n",crapstate.cpu.a,cpval,crapstate.cpu.Z,crapstate.cpu.C,crapstate.cpu.H);
+            
             break;
         }
         
@@ -2870,7 +2868,7 @@ static void opcodes(uint8_t opcode){
         }
         
         default:{
-            printf("Unhandled opcode: %X\n", opcode);
+            CRAPLOG("unreachable,something went terribly wrong if you reached this");
             while(1);
             break;
         }
@@ -2889,7 +2887,7 @@ static inline void handle_interrupt() {
         mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc ) >> 8); // High byte
         crapstate.cpu.sp--;
         mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc ) & 0xFF);
-        //printf("went to interrupt\n");
+        
         crapstate.cpu.ime = 0;
         
         if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_VBLANK ){
