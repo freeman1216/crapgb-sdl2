@@ -1,6 +1,7 @@
 /**
- * One snippet of this code is taken from PeanutGB https://github.com/deltabeard/Peanut-GB/ which is distrubuted with the
- * licence provided under 
+ * One snippet of this code is taken from PeanutGB
+ * https://github.com/deltabeard/Peanut-GB/ which is distrubuted with the
+ * licence provided under
  *
  * MIT License
  *
@@ -29,7 +30,8 @@
 // CPU instructions code generation
 // 16-bit instr
 
-#include "crapstate.h"
+
+
 #define LD_R16_N16(dest)                                                       \
   crapstate.cpu.dest = mem_read_word(crapstate.cpu.pc + 1);                    \
   crapstate.cpu.pc += 3;                                                       \
@@ -174,7 +176,7 @@
 
 #define XOR_A_R8(operand)                                                      \
   crapstate.cpu.a ^= crapstate.cpu.operand;                                    \
-  crapstate.cpu.f = 0;                                                          \
+  crapstate.cpu.f = 0;                                                         \
   crapstate.cpu.Z = !crapstate.cpu.a;                                          \
   crapstate.cpu.pc++;                                                          \
   crapstate.cpu.cycles += 4;                                                   \
@@ -211,7 +213,7 @@
 #define RLC_R8(operand)                                                        \
   crapstate.cpu.operand =                                                      \
       (crapstate.cpu.operand << 1) | (crapstate.cpu.operand >> 7);             \
-  crapstate.cpu.f = 0;                                                          \
+  crapstate.cpu.f = 0;                                                         \
   crapstate.cpu.C = crapstate.cpu.operand & 0x1;                               \
   crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
   break
@@ -220,7 +222,7 @@
   crapstate.cpu.f = 0;                                                         \
   crapstate.cpu.C = crapstate.cpu.operand & 0x1;                               \
   crapstate.cpu.operand =                                                      \
-  (crapstate.cpu.operand >> 1) | (crapstate.cpu.operand << 7);                 \
+      (crapstate.cpu.operand >> 1) | (crapstate.cpu.operand << 7);             \
   crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
   break
 
@@ -305,6 +307,8 @@
   mem_write_byte(crapstate.cpu.hl, byte);                                      \
   crapstate.cpu.cycles += 8;                                                   \
   break
-#define UNHANDLED_OPCODE()\
-  printf("Unhandled opcode: %X\n", opcode);\
-  while(1);
+
+#define UNHANDLED_OPCODE()                                                     \
+  CRAPLOG("UNHANDLED_OPCODE");                                                 \
+  while (1)                                                                    
+    
