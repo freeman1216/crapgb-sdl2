@@ -53,6 +53,9 @@ int main(int argc,char** argv ){
     assert(texture);
     
     SDL_Event event;
+
+    SDL_RenderSetLogicalSize(renderer, PIXELS_PER_SCANLINE, VISIBLE_SCANLINES);
+	SDL_RenderSetIntegerScale(renderer, 1);
     
     while (1) {
     
