@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -ggdb -Wall -DENABLE_GRAPHICS
+CFLAGS = -ggdb -Wall -DENABLE_GRAPHICS -fjump-tables
 LDFLAGS = -lSDL2main -lSDL2 
 INCLUDES = -Iinc/ -ISDL2
 
