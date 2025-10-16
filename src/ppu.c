@@ -311,7 +311,6 @@ void stop_ppu(){
 void start_ppu(){
     crapstate.ppu.mode = MODE2_OAM;
     crapstate.ppu.mode_cycles = MODE2_OAM_CYCLES;
-    crapstate.io.LY = 0;
     set_lcd_mode(MODE2_OAM);
     check_ly_lyc();  // Need to check because LY was reset
 }
