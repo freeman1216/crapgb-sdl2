@@ -4,11 +4,6 @@
 #include "ppu.h"
 #include "stdio.h"
 
-#ifdef ENABLE_GRAPHICS
-#include <SDL2/SDL.h>
-#include<SDL2/SDL_video.h>
-#endif
-
 typedef struct {
     // CPU Core
     struct {
@@ -109,13 +104,6 @@ typedef struct {
 
     } display;
 
-#ifdef ENABLE_GRAPHICS
-    struct{
-        SDL_Renderer* SDL_renderer;
-        SDL_Texture*  SDL_texture;
-       
-    }renderer;
-#endif
 
     struct {
         uint8_t right:1, left:1, up:1, down:1;
