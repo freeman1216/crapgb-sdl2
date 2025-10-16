@@ -2924,6 +2924,3 @@ void update_cpu(){
     opcodes(mem_read_byte(crapstate.cpu.pc));
     
 }
-void cpu_start(){
-    ;
-}
