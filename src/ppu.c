@@ -1,11 +1,6 @@
 #include "ppu.h"
 #include "crapstate.h"
 #include "defines.h"
-
-#ifdef ENABLE_GRAPHICS
-#include "renderer.h"
-#endif
-
 #include <stdint.h>
 
 
@@ -385,11 +380,6 @@ static void vblank_handler(){
         crapstate.display.vblank_counter++;
         crapstate.ppu.mode = MODE2_OAM;
         crapstate.ppu.mode_cycles = MODE2_OAM_CYCLES;
-        crapstate.io.LY = 0;
-        REQUEST_INTERRUPT(VBLANK_IF_BIT);
-#ifdef ENABLE_GRAPHICS
-        display_framebuffer();
-#endif
         set_lcd_mode(MODE2_OAM);
     }else{
         
