@@ -5,43 +5,16 @@
 
 
 
-
-
-#define REQUEST_INTERRUPT(bit)  crapstate.io.if_reg |= (1 << bit) // IF register
-
-void render_tileset(){
-    uint32_t tile = 0 ;
-    uint8_t tb1 ;
-    uint8_t tb2 ;
-    uint8_t palette_index = 0;
-    for(uint16_t scanline = 0;  scanline < VISIBLE_SCANLINES; scanline += 8 ){
-        for(uint16_t i = 0 ; i < PIXELS_PER_SCANLINE ; i++){
-            
-            tb1 = crapstate.mem.vram[tile];
-            tb2 = crapstate.mem.vram[tile+1];
-            
-            for(uint8_t bit = 7; bit !=255; bit--){
-                palette_index = (tb1 & 0x1)|((tb2&1)<<1);
-                crapstate.display.pixels[scanline+bit][i]=crapstate.display.palette[palette_index];
-                tb1 >>= 1;
-                tb2 >>= 1;
-                
-            }
-            tile+=2;
-        }
-    }
-}
-
 static inline void __render_bg(){
     uint8_t pix_y = crapstate.io.LY + crapstate.io.SCY;
     uint8_t tile_y = pix_y >> 3;
     uint8_t y_rem = pix_y & 0x07;
     uint16_t map_base;
-    
+
     if((crapstate.io.LCDC & LCDC_BG_TILE_MAP_MASK) == 0){
-        map_base = 0x9800 - VRAM_START + tile_y * 32;
+        map_base = TILEMAP1_ADDR - VRAM_START + tile_y * 32;
     }else{
-        map_base = 0x9C00 - VRAM_START + tile_y * 32;
+        map_base = TILEMAP2_ADDR - VRAM_START + tile_y * 32;
     }
     
     uint8_t draw_x  = PIXELS_PER_SCANLINE - 1;
@@ -65,7 +38,6 @@ static inline void __render_bg(){
 
     while(draw_x!=0xFF)  {
         
-        //fprintf(log_1, "bg_y%x, disp_x%x, bg_x%x, idx%x, py%x, px%x, t1%x, t2%x ,bg_map%x, tile%x\n",pix_y, draw_x, tile_x, tile_map_index, y_rem, 1, tb1, tb2, map_base, tile_index);
         uint8_t palette_index = (tb1 & 0x1)|((tb2&1)<<1);
         uint8_t colour = crapstate.display.BGP_indeces[palette_index];
         crapstate.display.pixels[crapstate.io.LY][draw_x]=crapstate.display.palette[colour];
@@ -96,9 +68,9 @@ static inline void __render_window(){
     uint16_t map_base;
     
     if((crapstate.io.LCDC & LCDC_WINDOW_TILE_MAP_MASK) == 0){
-        map_base = 0x9800 - VRAM_START + (crapstate.display.window_curr_line >> 3) * 32;
+        map_base = TILEMAP1_ADDR - VRAM_START + (crapstate.display.window_curr_line >> 3) * 32;
     }else{
-        map_base = 0x9C00 - VRAM_START + (crapstate.display.window_curr_line >> 3) * 32;
+        map_base = TILEMAP2_ADDR - VRAM_START + (crapstate.display.window_curr_line >> 3) * 32;
     }
     
     uint8_t draw_x  = PIXELS_PER_SCANLINE - 1;
@@ -124,7 +96,6 @@ static inline void __render_window(){
     
     while(draw_x!=x_last)  {
         
-        //fprintf(log_1, "bg_y%x, disp_x%x, bg_x%x, idx%x, py%x, px%x, t1%x, t2%x ,bg_map%x, tile%x\n",pix_y, draw_x, tile_x, tile_map_index, y_rem, 1, tb1, tb2, map_base, tile_index);
         uint8_t palette_index = (tb1 & 0x1)|((tb2&1)<<1);
         uint8_t colour = crapstate.display.BGP_indeces[palette_index];
         crapstate.display.pixels[crapstate.io.LY][draw_x]=crapstate.display.palette[colour];
@@ -309,6 +280,8 @@ static inline void check_ly_lyc() {
     }
 }
 
+//function used to report the internal ppu state to actual registers
+//dont call this on fake vblank mode and disabled mode
 static inline void set_lcd_mode(ppu_mode_t mode) {
     crapstate.io.STAT = (crapstate.io.STAT & ~0x03) | mode;
     crapstate.ppu.mode = mode;
