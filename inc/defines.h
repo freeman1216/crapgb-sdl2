@@ -1,6 +1,6 @@
 #pragma once
-#ifndef MEMORY_MAP_H
-#define MEMORY_MAP_H
+#ifndef DEFINES_H
+#define DEFINES_H
 
 
 
@@ -85,7 +85,7 @@
 #define INTERRUPT_SERIAL   (0x08)  // Bit 3
 #define INTERRUPT_JOYPAD   (0x10)  // Bit 4
 
-// ==== Interrupt Vector Addresses (for jumps) ====
+//Interrupt Vector Addresses 
 #define VBLANK_VECTOR      (0x0040)
 #define STAT_VECTOR        (0x0048)
 #define TIMER_VECTOR       (0x0050)
@@ -98,4 +98,4 @@
         fprintf(stderr, fmt, ##__VA_ARGS__); \
     } while (0)
 
-#endif // MEMORY_MAP_H
+#endif 

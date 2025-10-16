@@ -1,4 +1,6 @@
 #pragma once
+#ifndef PPU_H
+#define PPU_H
 
 #include <stdint.h>
 
@@ -15,3 +17,5 @@ typedef enum {
 void update_ppu (uint16_t clocks);
 void stop_ppu();
 void start_ppu();
+
+#endif

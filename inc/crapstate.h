@@ -1,4 +1,7 @@
 #pragma once
+#ifndef CRAPSTATE_H
+#define CRAPSTATE_H
+
 #include <stdint.h>
 #include "defines.h"
 #include "ppu.h"
@@ -114,3 +117,5 @@ typedef struct {
 extern crapstate_t crapstate;
 void crapstate_init();
 // Global instance
+
+#endif

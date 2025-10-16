@@ -1,5 +1,6 @@
 #pragma once
-
+#ifndef MEM_H
+#define MEM_H
 
 #include <stdint.h>
 
@@ -17,3 +18,5 @@ typedef enum{
 }joypad_part_t;
 
 void flag_joypad_interrupt(joypad_part_t);
+
+#endif

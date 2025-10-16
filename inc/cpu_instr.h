@@ -27,6 +27,8 @@
  *
  */
 #pragma once
+#ifndef CPU_INSTR_H
+#define CPU_INSTR_H
 // CPU instructions code generation
 // 16-bit instr
 
@@ -310,3 +312,4 @@
   CRAPLOG("UNHANDLED_OPCODE");                                                 \
   while (1)                                                                    
     
+#endif
