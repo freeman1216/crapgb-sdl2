@@ -348,7 +348,7 @@ static void vblank_handler(){
 //mode in which ppu is after bootrom
 static void fake_vblank_hander(){
     crapstate.ppu.mode = MODE2_OAM;
-    crapstate.ppu.mode_cycles = MODE2_OAM_CYCLES;
+    crapstate.ppu.mode_cycles = MODE2_OAM_CYCLES-FAKE_VBLANK_CYCLES;
     check_ly_lyc(); //can fire right after bootrom
     set_lcd_mode(MODE2_OAM);
 }
