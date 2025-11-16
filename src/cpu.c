@@ -1,61 +1,61 @@
 /*
- *Three parts of this code are taken from Sameboy emulator by Lior Halphon https://github.com/LIJI32/SameBoy
- *
- *
- * Expat License
- *
- * Copyright (c) 2015-2025 Lior Halphon
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in all
- * copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
- * SOFTWARE.
- *
- *
- * Two snippets of this code is taken from PeanutGB https://github.com/deltabeard/Peanut-GB/ which is distrubuted with the
- * licence provided under 
- *
- * MIT License
- *
- * Copyright (c) 2018-2023 Mahyar Koshkouei
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
- * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
- * IN THE SOFTWARE.
- *
- *
- * Everything else you can use however you see fit
- */
+*Three parts of this code are taken from Sameboy emulator by Lior Halphon https://github.com/LIJI32/SameBoy
+*
+*
+* Expat License
+*
+* Copyright (c) 2015-2025 Lior Halphon
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to deal
+* in the Software without restriction, including without limitation the rights
+* to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+* copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in all
+* copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+* SOFTWARE.
+*
+*
+* Two snippets of this code is taken from PeanutGB https://github.com/deltabeard/Peanut-GB/ which is distrubuted with the
+* licence provided under 
+*
+* MIT License
+*
+* Copyright (c) 2018-2023 Mahyar Koshkouei
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy
+* of this software and associated documentation files (the "Software"), to
+* deal in the Software without restriction, including without limitation the
+* rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+* sell copies of the Software, and to permit persons to whom the Software is
+* furnished to do so, subject to the following conditions:
+*
+* The above copyright notice and this permission notice shall be included in
+* all copies or substantial portions of the Software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+* IN THE SOFTWARE.
+*
+*
+* Everything else you can use however you see fit
+*/
 
 #include <stdint.h>
- 
+
 #include "cpu.h"
 #include "defines.h"
 #include "mem.h"
@@ -95,7 +95,7 @@ static inline void opcodes_cb(uint8_t postfix){
             crapstate.cpu.f = 0;
             crapstate.cpu.C = byte & 1;
             crapstate.cpu.Z = !byte;
-
+            
             crapstate.cpu.cycles+=8;
             
             break;
@@ -337,7 +337,7 @@ static inline void opcodes_cb(uint8_t postfix){
             crapstate.cpu.f = 0;
             crapstate.cpu.Z = !byte;                                    
             mem_write_byte(crapstate.cpu.hl,byte);
-                                                       
+            
             crapstate.cpu.cycles+=8;
             break;
         }
@@ -1271,7 +1271,7 @@ static void opcodes(uint8_t opcode){
             //STOP NYI
             UNHANDLED_OPCODE();
         }
-
+        
         case 0x11:{//LD DE, n16
             LD_R16_N16(de);
         }
@@ -2182,7 +2182,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.a ^= byte;
             crapstate.cpu.f = 0;
             crapstate.cpu.Z = !crapstate.cpu.a;
-
+            
             crapstate.cpu.pc++;
             crapstate.cpu.cycles += 8;
             
@@ -2496,7 +2496,7 @@ static void opcodes(uint8_t opcode){
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-
+        
         case 0xD4: { // CALL NC
             if (!crapstate.cpu.C) {
                 crapstate.cpu.sp--;
@@ -2577,7 +2577,7 @@ static void opcodes(uint8_t opcode){
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-
+        
         case 0xDC:  {//CALL C
             if (crapstate.cpu.C) {
                 crapstate.cpu.sp--;
@@ -2599,7 +2599,7 @@ static void opcodes(uint8_t opcode){
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-
+        
         case 0xDF:  {//RST 18H
             RST(0x18);
         }
@@ -2646,12 +2646,12 @@ static void opcodes(uint8_t opcode){
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-
+        
         case 0xE4: {
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-
+        
         case 0xE5: { // PUSH HL
             PUSH_R16(h, l);
         }
@@ -2692,7 +2692,7 @@ static void opcodes(uint8_t opcode){
             crapstate.cpu.cycles += 4;
             break;
         }
-
+        
         case 0xEA: { // LD (nn), A
             uint16_t addr = mem_read_word(crapstate.cpu.pc + 1);
             mem_write_byte(addr, crapstate.cpu.a);
@@ -2706,17 +2706,17 @@ static void opcodes(uint8_t opcode){
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-
+        
         case 0xEC: {
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-
+        
         case 0xED: {
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-
+        
         case 0xEE:  { //XOR A, n8
             uint8_t byte  = mem_read_byte(crapstate.cpu.pc+1);
             crapstate.cpu.a ^= byte;
@@ -2773,7 +2773,7 @@ static void opcodes(uint8_t opcode){
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-
+        
         case 0xF5: { // PUSH AF
             crapstate.cpu.sp--;
             mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.af) >> 8); // High byte
@@ -2844,12 +2844,12 @@ static void opcodes(uint8_t opcode){
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-
+        
         case 0xFD: {
             //ILLEGAL OPCODE
             UNHANDLED_OPCODE();
         }
-
+        
         case 0xFE: { //CP A N8
             uint8_t cpval = mem_read_byte(crapstate.cpu.pc+1);
             uint8_t res = crapstate.cpu.a - cpval;
@@ -2876,39 +2876,45 @@ static void opcodes(uint8_t opcode){
 }
 
 static inline void handle_interrupt() {
-    if ((crapstate.cpu.ime |crapstate.cpu.halted) && (crapstate.io.if_reg & crapstate.io.ie & 0x1F)) {
-        if(crapstate.cpu.halted ){
-            crapstate.cpu.pc ++;
-            crapstate.cpu.halted=0;
-        }
-        if(!crapstate.cpu.ime){
-            return;
-        }
-        crapstate.cpu.sp--;
-        mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc ) >> 8); // High byte
-        crapstate.cpu.sp--;
-        mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc ) & 0xFF);
-        
-        crapstate.cpu.ime = 0;
-        
-        if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_VBLANK ){
-            crapstate.cpu.pc = VBLANK_VECTOR;
-            crapstate.io.if_reg ^= INTERRUPT_VBLANK;
-        }else if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_STAT ){
-            crapstate.cpu.pc = STAT_VECTOR;
-            crapstate.io.if_reg ^= INTERRUPT_STAT;
-        }else if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_TIMER ){
-            crapstate.cpu.pc = TIMER_VECTOR;
-            crapstate.io.if_reg ^= INTERRUPT_TIMER;
-        }else if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_SERIAL ){
-            crapstate.cpu.pc = SERIAL_VECTOR;
-            crapstate.io.if_reg ^= INTERRUPT_SERIAL;
-        }else if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_JOYPAD ){
-            crapstate.cpu.pc = JOYPAD_VECTOR;
-            crapstate.io.if_reg ^= INTERRUPT_JOYPAD;
-        }
-        
-    } 
+    uint8_t pending = crapstate.io.if_reg & crapstate.io.ie & 0x1F;
+    
+    if (!pending){
+        return;
+    }
+    
+    if (crapstate.cpu.halted) {
+        crapstate.cpu.pc++;
+        crapstate.cpu.halted = 0;
+    }
+    
+    if (!crapstate.cpu.ime){
+        return;
+    }
+    crapstate.cpu.sp--;
+    mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc ) >> 8); // High byte
+    crapstate.cpu.sp--;
+    mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc ) & 0xFF);
+    
+    crapstate.cpu.ime = 0;
+    
+    if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_VBLANK ){
+        crapstate.cpu.pc = VBLANK_VECTOR;
+        crapstate.io.if_reg ^= INTERRUPT_VBLANK;
+    }else if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_STAT ){
+        crapstate.cpu.pc = STAT_VECTOR;
+        crapstate.io.if_reg ^= INTERRUPT_STAT;
+    }else if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_TIMER ){
+        crapstate.cpu.pc = TIMER_VECTOR;
+        crapstate.io.if_reg ^= INTERRUPT_TIMER;
+    }else if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_SERIAL ){
+        crapstate.cpu.pc = SERIAL_VECTOR;
+        crapstate.io.if_reg ^= INTERRUPT_SERIAL;
+    }else if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_JOYPAD ){
+        crapstate.cpu.pc = JOYPAD_VECTOR;
+        crapstate.io.if_reg ^= INTERRUPT_JOYPAD;
+    }
+    
+    
 }
 
 
@@ -2919,7 +2925,7 @@ void update_cpu(){
         crapstate.cpu.ime_pending =0;
         crapstate.cpu.ime=1;
     }
-
+    
     opcodes(mem_read_byte(crapstate.cpu.pc));
     
 }
