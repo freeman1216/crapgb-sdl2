@@ -277,7 +277,7 @@ static inline uint8_t read_joypad() {
     uint8_t result = 0xF;  // Default: no buttons pressed
     
     // Check direction buttons (if P1.4=0)
-    if (!(crapstate.io.P1 & JOYP_DPAD)) {
+    if ((crapstate.io.P1 & JOYP_DPAD) ^ JOYP_DPAD) {
         if (crapstate.buttons.right)  result &= ~(1 << 0);
         if (crapstate.buttons.left)   result &= ~(1 << 1);
         if (crapstate.buttons.up)     result &= ~(1 << 2);
@@ -285,7 +285,7 @@ static inline uint8_t read_joypad() {
     }
     
     // Check action buttons (if P1.5=0)
-    if (!(crapstate.io.P1 & JOYP_BUTTONS)) {
+    if ((crapstate.io.P1 & JOYP_BUTTONS) ^ JOYP_BUTTONS) {
         if (crapstate.buttons.A)      result &= ~(1 << 0);
         if (crapstate.buttons.B)      result &= ~(1 << 1);
         if (crapstate.buttons.start)  result &= ~(1 << 2);
@@ -295,16 +295,19 @@ static inline uint8_t read_joypad() {
     return (crapstate.io.P1 & 0xF0) | result;
 }
 
-void flag_joypad_interrupt(joypad_part_t part){
-    
-
-    if ((crapstate.io.P1 & JOYP_DPAD) ^ part) {
-       REQUEST_INTERRUPT(INTERRUPT_JOYPAD);
-    }
-    
-    
-    if ( (crapstate.io.P1 & JOYP_BUTTONS) ^ part) {
-       REQUEST_INTERRUPT(INTERRUPT_JOYPAD);
+void flag_joypad_interrupt(joypad_part_t part){ 
+    switch (part) {
+        case JOYP_BUTTONS: {
+            if((crapstate.io.P1 & JOYP_BUTTONS) ^ JOYP_BUTTONS){
+                REQUEST_INTERRUPT(INTERRUPT_JOYPAD);
+            }
+            break;
+        }
+        case JOYP_DPAD: {
+            if((crapstate.io.P1 & JOYP_DPAD) ^ JOYP_DPAD){
+                REQUEST_INTERRUPT(INTERRUPT_JOYPAD);
+            }
+        }
     }
 }
 
