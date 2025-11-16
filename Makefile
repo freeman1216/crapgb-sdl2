@@ -1,11 +1,11 @@
 CC = gcc
-CFLAGS = -ggdb -Wall -fjump-tables
+CFLAGS = -ggdb -O2 -flto -Wall -fjump-tables
 LDFLAGS = -lSDL2main -lSDL2 
 INCLUDES = -Iinc/ -ISDL2
 
 SRC_DIR = src
 BUILD_DIR = build
-BIN = $(BUILD_DIR)/gbcrapemu
+BIN = $(BUILD_DIR)/crapgb-sdl2
 
 # Find all .c files in src/
 CFILES = $(wildcard $(SRC_DIR)/*.c)
