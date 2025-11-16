@@ -2877,12 +2877,13 @@ static void opcodes(uint8_t opcode){
 
 static inline void handle_interrupt() {
     if ((crapstate.cpu.ime |crapstate.cpu.halted) && (crapstate.io.if_reg & crapstate.io.ie & 0x1F)) {
-        if(crapstate.cpu.halted && crapstate.cpu.ime ==0 ){
+        if(crapstate.cpu.halted ){
             crapstate.cpu.pc ++;
             crapstate.cpu.halted=0;
+        }
+        if(!crapstate.cpu.ime){
             return;
         }
-        crapstate.cpu.halted = 0;
         crapstate.cpu.sp--;
         mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc ) >> 8); // High byte
         crapstate.cpu.sp--;
