@@ -1,47 +1,47 @@
 #include <stdint.h>
 
 #include "ppu.h"
-#include "crapstate.h"
+#include "badstate.h"
 #include "defines.h"
 
 
 //internal function to draw a line of the bg to the fb
 static inline void __render_bg(){
-    uint8_t pix_y = crapstate.io.LY + crapstate.io.SCY;
+    uint8_t pix_y = badstate.io.LY + badstate.io.SCY;
     uint8_t tile_y = pix_y >> 3;
     uint8_t y_rem = pix_y & 0x07;
     uint16_t map_base;
 
-    if((crapstate.io.LCDC & LCDC_BG_TILE_MAP_MASK) == 0){
+    if((badstate.io.LCDC & LCDC_BG_TILE_MAP_MASK) == 0){
         map_base = TILEMAP1_ADDR - VRAM_START + tile_y * 32;
     }else{
         map_base = TILEMAP2_ADDR - VRAM_START + tile_y * 32;
     }
     
     uint8_t draw_x  = PIXELS_PER_SCANLINE - 1;
-    uint8_t tile_x = draw_x + crapstate.io.SCX;
+    uint8_t tile_x = draw_x + badstate.io.SCX;
     uint8_t x_rem = 7 - (tile_x & 0x07);
     
-    uint8_t tile_map_index = crapstate.mem.vram[map_base + (tile_x >> 3)] ;
+    uint8_t tile_map_index = badstate.mem.vram[map_base + (tile_x >> 3)] ;
     uint16_t tile_index;    
     
-    if(crapstate.io.LCDC & LCDC_TILESET_MASK){
+    if(badstate.io.LCDC & LCDC_TILESET_MASK){
         tile_index = tile_map_index * 16;
     }else{
         tile_index = TILESET_SIGNED - VRAM_START + (uint16_t)(((int8_t)tile_map_index)*16); 
     }
     
     tile_index += 2 * y_rem;
-    uint8_t tb1 = crapstate.mem.vram[tile_index];
-    uint8_t tb2 = crapstate.mem.vram[tile_index+1];
+    uint8_t tb1 = badstate.mem.vram[tile_index];
+    uint8_t tb2 = badstate.mem.vram[tile_index+1];
     tb1 >>= x_rem;
     tb2 >>= x_rem;
 
     while(draw_x!=0xFF)  {
         
         uint8_t palette_index = (tb1 & 0x1)|((tb2&1)<<1);
-        uint8_t colour = crapstate.display.BGP_indeces[palette_index];
-        crapstate.display.pixels[crapstate.io.LY][draw_x]=crapstate.display.palette[colour];
+        uint8_t colour = badstate.display.BGP_indeces[palette_index];
+        badstate.display.pixels[badstate.io.LY][draw_x]=badstate.display.palette[colour];
         tb1 >>= 1;
         tb2 >>= 1;            
         draw_x--;
@@ -49,18 +49,18 @@ static inline void __render_bg(){
         
         if(x_rem == 8){
             x_rem = 0;
-            tile_x = draw_x + crapstate.io.SCX;
-            tile_map_index = crapstate.mem.vram[map_base + (tile_x >> 3)] ;   
+            tile_x = draw_x + badstate.io.SCX;
+            tile_map_index = badstate.mem.vram[map_base + (tile_x >> 3)] ;   
             
-            if(crapstate.io.LCDC & LCDC_TILESET_MASK){
+            if(badstate.io.LCDC & LCDC_TILESET_MASK){
                 tile_index = tile_map_index * 16;
             }else{
                 tile_index = TILESET_SIGNED - VRAM_START + (uint16_t)(((int8_t)tile_map_index)*16); 
             }
             
             tile_index += 2 * y_rem;
-            tb1 = crapstate.mem.vram[tile_index];
-            tb2 = crapstate.mem.vram[tile_index+1];
+            tb1 = badstate.mem.vram[tile_index];
+            tb2 = badstate.mem.vram[tile_index+1];
         }
     }
 }
@@ -68,38 +68,38 @@ static inline void __render_bg(){
 static inline void __render_window(){
     uint16_t map_base;
     
-    if((crapstate.io.LCDC & LCDC_WINDOW_TILE_MAP_MASK) == 0){
-        map_base = TILEMAP1_ADDR - VRAM_START + (crapstate.display.window_curr_line >> 3) * 32;
+    if((badstate.io.LCDC & LCDC_WINDOW_TILE_MAP_MASK) == 0){
+        map_base = TILEMAP1_ADDR - VRAM_START + (badstate.display.window_curr_line >> 3) * 32;
     }else{
-        map_base = TILEMAP2_ADDR - VRAM_START + (crapstate.display.window_curr_line >> 3) * 32;
+        map_base = TILEMAP2_ADDR - VRAM_START + (badstate.display.window_curr_line >> 3) * 32;
     }
     
     uint8_t draw_x  = PIXELS_PER_SCANLINE - 1;
-    uint8_t tile_x = draw_x - crapstate.io.WX + 7;
+    uint8_t tile_x = draw_x - badstate.io.WX + 7;
     uint8_t x_rem = 7 - (tile_x & 0x07);
     
-    uint8_t tile_map_index = crapstate.mem.vram[map_base + (tile_x >> 3)] ;
+    uint8_t tile_map_index = badstate.mem.vram[map_base + (tile_x >> 3)] ;
     uint16_t tile_index;    
-    uint8_t y_rem = crapstate.display.window_curr_line & 0x07;
+    uint8_t y_rem = badstate.display.window_curr_line & 0x07;
     
-    if(crapstate.io.LCDC & LCDC_TILESET_MASK){
+    if(badstate.io.LCDC & LCDC_TILESET_MASK){
         tile_index = tile_map_index * 16;
     }else{
         tile_index = TILESET_SIGNED - VRAM_START + (uint16_t)(((int8_t)tile_map_index)*16); 
     }
     
     tile_index += 2 * y_rem;
-    uint8_t tb1 = crapstate.mem.vram[tile_index];
-    uint8_t tb2 = crapstate.mem.vram[tile_index+1];
+    uint8_t tb1 = badstate.mem.vram[tile_index];
+    uint8_t tb2 = badstate.mem.vram[tile_index+1];
     tb1 >>= x_rem;
     tb2 >>= x_rem;
-    uint8_t x_last = (crapstate.io.WX > 7 ? crapstate.io.WX - 7 : 0)-1 ;
+    uint8_t x_last = (badstate.io.WX > 7 ? badstate.io.WX - 7 : 0)-1 ;
     
     while(draw_x!=x_last)  {
         
         uint8_t palette_index = (tb1 & 0x1)|((tb2&1)<<1);
-        uint8_t colour = crapstate.display.BGP_indeces[palette_index];
-        crapstate.display.pixels[crapstate.io.LY][draw_x]=crapstate.display.palette[colour];
+        uint8_t colour = badstate.display.BGP_indeces[palette_index];
+        badstate.display.pixels[badstate.io.LY][draw_x]=badstate.display.palette[colour];
         tb1 >>= 1;
         tb2 >>= 1;            
         draw_x--;
@@ -107,22 +107,22 @@ static inline void __render_window(){
         
         if(x_rem == 8){
             x_rem = 0;
-            tile_x = draw_x  - crapstate.io.WX + 7;
-            tile_map_index = crapstate.mem.vram[map_base + (tile_x >> 3)] ;   
+            tile_x = draw_x  - badstate.io.WX + 7;
+            tile_map_index = badstate.mem.vram[map_base + (tile_x >> 3)] ;   
             
-            if(crapstate.io.LCDC & LCDC_TILESET_MASK){
+            if(badstate.io.LCDC & LCDC_TILESET_MASK){
                 tile_index = tile_map_index * 16;
             }else{
                 tile_index = TILESET_SIGNED - VRAM_START + (uint16_t)(((int8_t)tile_map_index)*16); 
             }
             
             tile_index += 2 * y_rem;
-            tb1 = crapstate.mem.vram[tile_index];
-            tb2 = crapstate.mem.vram[tile_index+1];
+            tb1 = badstate.mem.vram[tile_index];
+            tb2 = badstate.mem.vram[tile_index+1];
         }
     }
     
-    crapstate.display.window_curr_line++;
+    badstate.display.window_curr_line++;
 }
 
 typedef struct{
@@ -175,13 +175,13 @@ static inline void __insert_sprite(sprite_list_t* render_list, sprite_data_t* ca
 // internal function to render 1 line of sprites to the fb
 // finds 10 most prioritised sprites and renders them from least prioritised to most
 static inline void __render_sprites(){ 
-    sprite_data_t *sprite_view =(sprite_data_t *)crapstate.mem.oam;
+    sprite_data_t *sprite_view =(sprite_data_t *)badstate.mem.oam;
     sprite_list_t list ;
     list.sprite_count = 0;
-    uint8_t added_y= (crapstate.io.LCDC & LCDC_OBJ_SIZE_MASK ) ? 8 : 0;
+    uint8_t added_y= (badstate.io.LCDC & LCDC_OBJ_SIZE_MASK ) ? 8 : 0;
     
     for(uint8_t i = 0; i < 40; i++){
-        if(crapstate.io.LY+16 - (sprite_view->y) < 8 + added_y && crapstate.io.LY+16 >= sprite_view->y ){
+        if(badstate.io.LY+16 - (sprite_view->y) < 8 + added_y && badstate.io.LY+16 >= sprite_view->y ){
             __insert_sprite(&list,sprite_view);
         }
         sprite_view++;
@@ -195,16 +195,16 @@ static inline void __render_sprites(){
             continue;
         }
         
-        uint8_t tile_index = sprite_view->tile_index & ~((crapstate.io.LCDC & 0x04) >> 2);
-        uint8_t py = crapstate.io.LY+16 - (sprite_view->y);
+        uint8_t tile_index = sprite_view->tile_index & ~((badstate.io.LCDC & 0x04) >> 2);
+        uint8_t py = badstate.io.LY+16 - (sprite_view->y);
         
         if(sprite_view->attributes & ATTR_YFLIP_MASK){ // if y flip just fetch the other side of the sprite
             py = (7+added_y) - py;
         }
         
         uint16_t tile = (tile_index * 16) + py*2;
-        uint8_t tb1 = crapstate.mem.vram[tile];
-        uint8_t tb2 = crapstate.mem.vram[tile+1];
+        uint8_t tb1 = badstate.mem.vram[tile];
+        uint8_t tb2 = badstate.mem.vram[tile+1];
         uint8_t draw_x;
         uint8_t x_rem = 0;
         uint8_t inc;
@@ -232,12 +232,12 @@ static inline void __render_sprites(){
         tb2 >>= x_rem;
 
         if(sprite_view->attributes & ATTR_PRIORITY_MASK){
-            uint16_t bg_colour = crapstate.display.palette[0]; 
+            uint16_t bg_colour = badstate.display.palette[0]; 
             for (; x_rem < pixnum ; x_rem++) {
                 uint8_t palette_index = (tb1 & 1)|((tb2 & 1)<<1);
-                if(crapstate.display.pixels[crapstate.io.LY][draw_x] == bg_colour && palette_index){
-                    uint8_t colour = crapstate.display.OBP_indeces[palette][palette_index];
-                    crapstate.display.pixels[crapstate.io.LY][draw_x]=crapstate.display.palette[colour];
+                if(badstate.display.pixels[badstate.io.LY][draw_x] == bg_colour && palette_index){
+                    uint8_t colour = badstate.display.OBP_indeces[palette][palette_index];
+                    badstate.display.pixels[badstate.io.LY][draw_x]=badstate.display.palette[colour];
                 }
                 tb1 >>= 1;
                 tb2 >>= 1;            
@@ -247,8 +247,8 @@ static inline void __render_sprites(){
             for (; x_rem < pixnum ; x_rem++) {
                 uint8_t palette_index = (tb1 & 1)|((tb2 & 1)<<1);  
                 if(palette_index){
-                    uint8_t colour = crapstate.display.OBP_indeces[palette][palette_index];
-                    crapstate.display.pixels[crapstate.io.LY][draw_x]=crapstate.display.palette[colour];
+                    uint8_t colour = badstate.display.OBP_indeces[palette][palette_index];
+                    badstate.display.pixels[badstate.io.LY][draw_x]=badstate.display.palette[colour];
                 }
                 tb1 >>= 1;
                 tb2 >>= 1;            
@@ -262,106 +262,106 @@ static inline void __render_sprites(){
 //midscanline effects doesnt work because of the nature of per scanline rendering
 static inline void render_line(){
     
-    if(crapstate.io.LCDC & LCDC_BG_ENABLE_MASK){
+    if(badstate.io.LCDC & LCDC_BG_ENABLE_MASK){
         __render_bg();
     }
     
-    if((crapstate.io.LCDC & BG_WIN_ENABLE_MASK) == BG_WIN_ENABLE_MASK  && crapstate.io.WY <= crapstate.io.LY && crapstate.io.WX <= 166 ){
+    if((badstate.io.LCDC & BG_WIN_ENABLE_MASK) == BG_WIN_ENABLE_MASK  && badstate.io.WY <= badstate.io.LY && badstate.io.WX <= 166 ){
         
         __render_window();
     }
     
-    if(crapstate.io.LCDC & LCDC_OBJ_ENABLE_MASK){
+    if(badstate.io.LCDC & LCDC_OBJ_ENABLE_MASK){
         __render_sprites();
     }
     
 }
 
 static inline void check_ly_lyc() {
-    if (crapstate.io.LY == crapstate.io.LYC) {
-        crapstate.io.STAT |= STAT_LYC_MASK; 
-        if (crapstate.io.STAT & STAT_LYC_INT_ENABLE_MASK) {
+    if (badstate.io.LY == badstate.io.LYC) {
+        badstate.io.STAT |= STAT_LYC_MASK; 
+        if (badstate.io.STAT & STAT_LYC_INT_ENABLE_MASK) {
             REQUEST_INTERRUPT(INTERRUPT_STAT); 
         }
     } else {
-        crapstate.io.STAT &= ~STAT_LYC_MASK; // Clear coincidence flag
+        badstate.io.STAT &= ~STAT_LYC_MASK; // Clear coincidence flag
     }
 }
 
 //function used to report the internal ppu state to actual registers
 //dont call this on fake vblank mode and disabled mode
 static inline void set_lcd_mode(ppu_mode_t mode) {
-    crapstate.io.STAT = (crapstate.io.STAT & ~0x03) | mode;
-    crapstate.ppu.mode = mode;
+    badstate.io.STAT = (badstate.io.STAT & ~0x03) | mode;
+    badstate.ppu.mode = mode;
     
     // Trigger STAT interrupt if enabled for this mode
     if (mode != MODE3_DRAW) {
-        if (crapstate.io.STAT & (1 << (mode + 3))) {
+        if (badstate.io.STAT & (1 << (mode + 3))) {
             REQUEST_INTERRUPT(INTERRUPT_STAT); 
         }
     }
 }
 
 void stop_ppu(){
-    crapstate.ppu.mode = MODE_DISABLED;
-    crapstate.io.LY = 0;
-    crapstate.io.STAT &= ~(STAT_MODE_MASK | STAT_LYC_MASK);  // Clear mode and coincidence
+    badstate.ppu.mode = MODE_DISABLED;
+    badstate.io.LY = 0;
+    badstate.io.STAT &= ~(STAT_MODE_MASK | STAT_LYC_MASK);  // Clear mode and coincidence
 }
 
 void start_ppu(){
-    crapstate.ppu.mode = MODE2_OAM;
-    crapstate.ppu.mode_cycles = MODE2_OAM_CYCLES;
+    badstate.ppu.mode = MODE2_OAM;
+    badstate.ppu.mode_cycles = MODE2_OAM_CYCLES;
     set_lcd_mode(MODE2_OAM);
     check_ly_lyc();  // Need to check because LY was reset
 }
 
 static void hblank_handler(){
-    if(++crapstate.io.LY!=VISIBLE_SCANLINES){
-        crapstate.ppu.mode = MODE2_OAM;
-        crapstate.ppu.mode_cycles = MODE2_OAM_CYCLES;
+    if(++badstate.io.LY!=VISIBLE_SCANLINES){
+        badstate.ppu.mode = MODE2_OAM;
+        badstate.ppu.mode_cycles = MODE2_OAM_CYCLES;
         set_lcd_mode(MODE2_OAM);
     }else{
-        crapstate.ppu.mode = MODE1_VBLANK;
-        crapstate.ppu.mode_cycles = CYCLES_PER_SCANLINE;
+        badstate.ppu.mode = MODE1_VBLANK;
+        badstate.ppu.mode_cycles = CYCLES_PER_SCANLINE;
         set_lcd_mode(MODE1_VBLANK);
         REQUEST_INTERRUPT(INTERRUPT_VBLANK);
-        crapstate.display.frame_finished=1;
+        badstate.display.frame_finished=1;
     }
     check_ly_lyc();
    
 }
 
 static void vblank_handler(){
-    if(++crapstate.io.LY==TOTAL_SCANLINES){
-        crapstate.io.LY = 0;
-        crapstate.display.window_curr_line = 0;
-        crapstate.ppu.mode = MODE2_OAM;
-        crapstate.ppu.mode_cycles = MODE2_OAM_CYCLES;
+    if(++badstate.io.LY==TOTAL_SCANLINES){
+        badstate.io.LY = 0;
+        badstate.display.window_curr_line = 0;
+        badstate.ppu.mode = MODE2_OAM;
+        badstate.ppu.mode_cycles = MODE2_OAM_CYCLES;
         set_lcd_mode(MODE2_OAM);
     }else{
         
-        crapstate.ppu.mode_cycles = CYCLES_PER_SCANLINE;
+        badstate.ppu.mode_cycles = CYCLES_PER_SCANLINE;
     }
     check_ly_lyc();
 }
 
 //mode in which ppu is after bootrom
 static void fake_vblank_hander(){
-    crapstate.ppu.mode = MODE2_OAM;
-    crapstate.ppu.mode_cycles = MODE2_OAM_CYCLES-FAKE_VBLANK_CYCLES;
+    badstate.ppu.mode = MODE2_OAM;
+    badstate.ppu.mode_cycles = MODE2_OAM_CYCLES-FAKE_VBLANK_CYCLES;
     check_ly_lyc(); //can fire right after bootrom
     set_lcd_mode(MODE2_OAM);
 }
 
 static void draw_handler(){
-    crapstate.ppu.mode = MODE0_HBLANK;
-    crapstate.ppu.mode_cycles = MODE0_HBLANK_CYCLES;
+    badstate.ppu.mode = MODE0_HBLANK;
+    badstate.ppu.mode_cycles = MODE0_HBLANK_CYCLES;
     set_lcd_mode(MODE0_HBLANK);
 }
 
 static void oam_search_hander(){
-    crapstate.ppu.mode = MODE3_DRAW;
-    crapstate.ppu.mode_cycles = MODE3_DRAW_CYCLES;
+    badstate.ppu.mode = MODE3_DRAW;
+    badstate.ppu.mode_cycles = MODE3_DRAW_CYCLES;
     set_lcd_mode(MODE3_DRAW);
     render_line();
 }
@@ -377,18 +377,18 @@ static void (* const mode_change_handlers[])  (void) = {
 //public stepping function 
 void update_ppu(uint16_t clocks){
 
-    if(crapstate.ppu.mode == MODE_DISABLED){
+    if(badstate.ppu.mode == MODE_DISABLED){
         return;
     }
     
     while(clocks != 0){
         
-        uint16_t step = (clocks > crapstate.ppu.mode_cycles) ?  crapstate.ppu.mode_cycles : clocks; 
-        crapstate.ppu.mode_cycles-= step;
+        uint16_t step = (clocks > badstate.ppu.mode_cycles) ?  badstate.ppu.mode_cycles : clocks; 
+        badstate.ppu.mode_cycles-= step;
         clocks -= step;
         
-        if(crapstate.ppu.mode_cycles==0){
-            mode_change_handlers[crapstate.ppu.mode]();
+        if(badstate.ppu.mode_cycles==0){
+            mode_change_handlers[badstate.ppu.mode]();
         }
     }
     

@@ -59,7 +59,7 @@
 #include "cpu.h"
 #include "defines.h"
 #include "mem.h"
-#include "crapstate.h"
+#include "badstate.h"
 #include "cpu_instr.h"
 
 static inline void opcodes_cb(uint8_t postfix){
@@ -89,14 +89,14 @@ static inline void opcodes_cb(uint8_t postfix){
         }
         
         case 0x06:  { //RLC [HL]
-            uint8_t byte = mem_read_byte(crapstate.cpu.hl);
+            uint8_t byte = mem_read_byte(badstate.cpu.hl);
             byte = (byte << 1) | (byte >> 7);
-            mem_write_byte(crapstate.cpu.hl, byte);
-            crapstate.cpu.f = 0;
-            crapstate.cpu.C = byte & 1;
-            crapstate.cpu.Z = !byte;
+            mem_write_byte(badstate.cpu.hl, byte);
+            badstate.cpu.f = 0;
+            badstate.cpu.C = byte & 1;
+            badstate.cpu.Z = !byte;
             
-            crapstate.cpu.cycles+=8;
+            badstate.cpu.cycles+=8;
             
             break;
         }
@@ -130,13 +130,13 @@ static inline void opcodes_cb(uint8_t postfix){
         }
         
         case 0x0E:  { //RRC [HL] 
-            uint8_t byte = mem_read_byte(crapstate.cpu.hl);
-            crapstate.cpu.f = 0;
-            crapstate.cpu.C = byte & 0x1;
+            uint8_t byte = mem_read_byte(badstate.cpu.hl);
+            badstate.cpu.f = 0;
+            badstate.cpu.C = byte & 0x1;
             byte = (byte >>1) | (byte << 7 );
-            crapstate.cpu.Z = !byte;  
-            mem_write_byte(crapstate.cpu.hl, byte);
-            crapstate.cpu.cycles+=8;
+            badstate.cpu.Z = !byte;  
+            mem_write_byte(badstate.cpu.hl, byte);
+            badstate.cpu.cycles+=8;
             
             break;
         }
@@ -170,15 +170,15 @@ static inline void opcodes_cb(uint8_t postfix){
         }
         
         case 0x16:  { //RL [HL]
-            uint8_t old_carry = crapstate.cpu.C;
-            uint8_t byte = mem_read_byte(crapstate.cpu.hl);
-            crapstate.cpu.f = 0;
-            crapstate.cpu.C = (byte) & 0x80 ? 1 : 0 ;
+            uint8_t old_carry = badstate.cpu.C;
+            uint8_t byte = mem_read_byte(badstate.cpu.hl);
+            badstate.cpu.f = 0;
+            badstate.cpu.C = (byte) & 0x80 ? 1 : 0 ;
             byte <<= 1;
             byte |= old_carry;
-            mem_write_byte(crapstate.cpu.hl, byte);
-            crapstate.cpu.Z = !byte;
-            crapstate.cpu.cycles+=8;
+            mem_write_byte(badstate.cpu.hl, byte);
+            badstate.cpu.Z = !byte;
+            badstate.cpu.cycles+=8;
             
             break;
         }
@@ -212,16 +212,16 @@ static inline void opcodes_cb(uint8_t postfix){
         }
         
         case 0x1E:  { //RR [HL]
-            uint8_t byte = mem_read_byte(crapstate.cpu.hl);
-            uint8_t old_carry = crapstate.cpu.C;
-            crapstate.cpu.f = 0;
-            crapstate.cpu.C = byte & 1;
+            uint8_t byte = mem_read_byte(badstate.cpu.hl);
+            uint8_t old_carry = badstate.cpu.C;
+            badstate.cpu.f = 0;
+            badstate.cpu.C = byte & 1;
             byte  >>=1; 
             byte |= (old_carry<<7);
-            crapstate.cpu.Z = !byte;
-            mem_write_byte(crapstate.cpu.hl, byte);
+            badstate.cpu.Z = !byte;
+            mem_write_byte(badstate.cpu.hl, byte);
             
-            crapstate.cpu.cycles+=8;
+            badstate.cpu.cycles+=8;
             break;
         }
         
@@ -254,13 +254,13 @@ static inline void opcodes_cb(uint8_t postfix){
         }
         
         case 0x26:  { //SLA [HL]
-            uint8_t byte = mem_read_byte(crapstate.cpu.hl);
-            crapstate.cpu.f = 0;                           
-            crapstate.cpu.C = (byte & 0x80) != 0;                       
+            uint8_t byte = mem_read_byte(badstate.cpu.hl);
+            badstate.cpu.f = 0;                           
+            badstate.cpu.C = (byte & 0x80) != 0;                       
             byte <<= 1;                                                 
-            mem_write_byte(crapstate.cpu.hl, byte);                                    
-            crapstate.cpu.Z = !byte;
-            crapstate.cpu.cycles+=8;                            
+            mem_write_byte(badstate.cpu.hl, byte);                                    
+            badstate.cpu.Z = !byte;
+            badstate.cpu.cycles+=8;                            
             break;
         }
         
@@ -293,13 +293,13 @@ static inline void opcodes_cb(uint8_t postfix){
         }
         
         case 0x2E:  { //SRA [HL]
-            uint8_t byte = mem_read_byte(crapstate.cpu.hl);
-            crapstate.cpu.f = 0;
-            crapstate.cpu.C = byte & 0x1;                               
+            uint8_t byte = mem_read_byte(badstate.cpu.hl);
+            badstate.cpu.f = 0;
+            badstate.cpu.C = byte & 0x1;                               
             byte = (byte>> 1) | (byte & 0x80);               
-            crapstate.cpu.Z = !byte;   
-            mem_write_byte(crapstate.cpu.hl, byte);                                    
-            crapstate.cpu.cycles+=8;
+            badstate.cpu.Z = !byte;   
+            mem_write_byte(badstate.cpu.hl, byte);                                    
+            badstate.cpu.cycles+=8;
             break;
         }
         
@@ -332,13 +332,13 @@ static inline void opcodes_cb(uint8_t postfix){
         }
         
         case 0x36:  { //SWAP [HL]
-            uint8_t byte = mem_read_byte(crapstate.cpu.hl);
+            uint8_t byte = mem_read_byte(badstate.cpu.hl);
             byte = (byte << 4) | (byte >> 4);             
-            crapstate.cpu.f = 0;
-            crapstate.cpu.Z = !byte;                                    
-            mem_write_byte(crapstate.cpu.hl,byte);
+            badstate.cpu.f = 0;
+            badstate.cpu.Z = !byte;                                    
+            mem_write_byte(badstate.cpu.hl,byte);
             
-            crapstate.cpu.cycles+=8;
+            badstate.cpu.cycles+=8;
             break;
         }
         
@@ -371,13 +371,13 @@ static inline void opcodes_cb(uint8_t postfix){
         }
         
         case 0x3E:  { //SRL [HL]
-            uint8_t byte = mem_read_byte(crapstate.cpu.hl);
-            crapstate.cpu.f = 0;
-            crapstate.cpu.C = (byte & 0x01);
+            uint8_t byte = mem_read_byte(badstate.cpu.hl);
+            badstate.cpu.f = 0;
+            badstate.cpu.C = (byte & 0x01);
             byte >>= 1;                                                 
-            crapstate.cpu.Z = !byte;
-            mem_write_byte(crapstate.cpu.hl, byte);                                    
-            crapstate.cpu.cycles+=8;                                                         
+            badstate.cpu.Z = !byte;
+            mem_write_byte(badstate.cpu.hl, byte);                                    
+            badstate.cpu.cycles+=8;                                                         
             break;
         }
         
@@ -1156,7 +1156,7 @@ static inline void opcodes_cb(uint8_t postfix){
         
         default:{
             
-            CRAPLOG("unreachable,something went terribly wrong if you reached this");
+            BADLOG("unreachable,something went terribly wrong if you reached this");
             while(1);
         }
     }
@@ -1166,8 +1166,8 @@ static void opcodes(uint8_t opcode){
     switch (opcode) {
         case 0x00:{// NOP
             
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles+=4;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles+=4;
             break;
         }
         case 0x01:{ //LD BC, n16
@@ -1175,9 +1175,9 @@ static void opcodes(uint8_t opcode){
             
         }
         case 0x02: { // LD [BC], A
-            mem_write_byte(crapstate.cpu.bc,crapstate.cpu.a);
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles+=8;
+            mem_write_byte(badstate.cpu.bc,badstate.cpu.a);
+            badstate.cpu.pc++;
+            badstate.cpu.cycles+=8;
             
             break;  
         }
@@ -1198,44 +1198,44 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0x07: {  // RLCA
-            uint8_t old_A = crapstate.cpu.a;
-            crapstate.cpu.a = (old_A << 1) | (old_A >> 7);
-            crapstate.cpu.C = crapstate.cpu.a & 1;
-            crapstate.cpu.Z = 0;  // Unlike RLC A, Z is always 0 in RLCA!
-            crapstate.cpu.H = 0;
-            crapstate.cpu.N = 0;
+            uint8_t old_A = badstate.cpu.a;
+            badstate.cpu.a = (old_A << 1) | (old_A >> 7);
+            badstate.cpu.C = badstate.cpu.a & 1;
+            badstate.cpu.Z = 0;  // Unlike RLC A, Z is always 0 in RLCA!
+            badstate.cpu.H = 0;
+            badstate.cpu.N = 0;
             
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles+=4;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles+=4;
             break;
         }
         
         case 0x08:  { // LD [n16], SP
-            uint16_t addr = mem_read_word(crapstate.cpu.pc+1);
-            mem_write_word(addr,crapstate.cpu.sp);
-            crapstate.cpu.pc+=3;
-            crapstate.cpu.cycles+=20;
+            uint16_t addr = mem_read_word(badstate.cpu.pc+1);
+            mem_write_word(addr,badstate.cpu.sp);
+            badstate.cpu.pc+=3;
+            badstate.cpu.cycles+=20;
             
             break;
         }
         
         case 0x09:{ // ADD HL, BC
-            uint16_t old_hl = crapstate.cpu.hl;
-            crapstate.cpu.hl += crapstate.cpu.bc;
-            crapstate.cpu.N = 0;
-            crapstate.cpu.H = ((old_hl & 0x0FFF) + (crapstate.cpu.bc & 0x0FFF)) > 0x0FFF;
-            crapstate.cpu.C = ((uint32_t)old_hl + (uint32_t)crapstate.cpu.bc) > 0xFFFF;
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 8;
+            uint16_t old_hl = badstate.cpu.hl;
+            badstate.cpu.hl += badstate.cpu.bc;
+            badstate.cpu.N = 0;
+            badstate.cpu.H = ((old_hl & 0x0FFF) + (badstate.cpu.bc & 0x0FFF)) > 0x0FFF;
+            badstate.cpu.C = ((uint32_t)old_hl + (uint32_t)badstate.cpu.bc) > 0xFFFF;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 8;
             
             break;
         }
         
         case 0x0A: { // LD A, (BC)
-            crapstate.cpu.a = mem_read_byte(crapstate.cpu.bc);
+            badstate.cpu.a = mem_read_byte(badstate.cpu.bc);
             
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 8;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 8;
             break;
         }
         case 0x0B:{ //DEC BC
@@ -1255,14 +1255,14 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0x0F:  { //RRCA
-            uint8_t old_A = crapstate.cpu.a;
-            crapstate.cpu.a = (old_A >> 1) | (old_A << 7);
-            crapstate.cpu.C = old_A & 1;
-            crapstate.cpu.Z = 0;
-            crapstate.cpu.N = 0;
-            crapstate.cpu.H = 0;
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles+=4;
+            uint8_t old_A = badstate.cpu.a;
+            badstate.cpu.a = (old_A >> 1) | (old_A << 7);
+            badstate.cpu.C = old_A & 1;
+            badstate.cpu.Z = 0;
+            badstate.cpu.N = 0;
+            badstate.cpu.H = 0;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles+=4;
             
             break;
         }
@@ -1277,9 +1277,9 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0x12:{ // LD [DE],a
-            mem_write_byte(crapstate.cpu.de, crapstate.cpu.a);
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles+=8;
+            mem_write_byte(badstate.cpu.de, badstate.cpu.a);
+            badstate.cpu.pc++;
+            badstate.cpu.cycles+=8;
             
             break;
         }
@@ -1301,44 +1301,44 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0x17:  { // RLA            
-            uint8_t old_carry = crapstate.cpu.C;
-            crapstate.cpu.C = (crapstate.cpu.a) & 0x80 ? 1 : 0 ;
-            crapstate.cpu.a <<= 1;
-            crapstate.cpu.a |= old_carry;
-            crapstate.cpu.H = 0;
-            crapstate.cpu.Z = 0;
-            crapstate.cpu.N = 0;
+            uint8_t old_carry = badstate.cpu.C;
+            badstate.cpu.C = (badstate.cpu.a) & 0x80 ? 1 : 0 ;
+            badstate.cpu.a <<= 1;
+            badstate.cpu.a |= old_carry;
+            badstate.cpu.H = 0;
+            badstate.cpu.Z = 0;
+            badstate.cpu.N = 0;
             
-            crapstate.cpu.pc+=1;
-            crapstate.cpu.cycles+=4;
+            badstate.cpu.pc+=1;
+            badstate.cpu.cycles+=4;
             break;
         }
         
         case 0x18:{ // JR
-            int8_t offset = (int8_t)mem_read_byte(crapstate.cpu.pc+1);
-            crapstate.cpu.pc = crapstate.cpu.pc+2+offset;
+            int8_t offset = (int8_t)mem_read_byte(badstate.cpu.pc+1);
+            badstate.cpu.pc = badstate.cpu.pc+2+offset;
             
-            crapstate.cpu.cycles+=12;
+            badstate.cpu.cycles+=12;
             break;
         }
         
         case 0x19:{ // ADD HL, DE
-            uint16_t old_hl = crapstate.cpu.hl;
-            crapstate.cpu.hl += crapstate.cpu.de;
-            crapstate.cpu.N = 0;
-            crapstate.cpu.H = ((old_hl & 0x0FFF) + (crapstate.cpu.de & 0x0FFF)) > 0x0FFF;
-            crapstate.cpu.C = ((uint32_t)old_hl + (uint32_t)crapstate.cpu.de) > 0xFFFF;
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 8;
+            uint16_t old_hl = badstate.cpu.hl;
+            badstate.cpu.hl += badstate.cpu.de;
+            badstate.cpu.N = 0;
+            badstate.cpu.H = ((old_hl & 0x0FFF) + (badstate.cpu.de & 0x0FFF)) > 0x0FFF;
+            badstate.cpu.C = ((uint32_t)old_hl + (uint32_t)badstate.cpu.de) > 0xFFFF;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 8;
             
             break;
         }
         
         case 0x1A: { // LD A, (DE)
-            crapstate.cpu.a = mem_read_byte(crapstate.cpu.de);
+            badstate.cpu.a = mem_read_byte(badstate.cpu.de);
             
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 8;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 8;
             break;
         }
         
@@ -1359,27 +1359,27 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0x1F: { //RRA
-            uint8_t old_carry = crapstate.cpu.C;
-            crapstate.cpu.f = 0;
-            crapstate.cpu.C = (crapstate.cpu.a) & 0x1 ;
-            crapstate.cpu.a >>= 1;
-            crapstate.cpu.a |= (old_carry<<7);
+            uint8_t old_carry = badstate.cpu.C;
+            badstate.cpu.f = 0;
+            badstate.cpu.C = (badstate.cpu.a) & 0x1 ;
+            badstate.cpu.a >>= 1;
+            badstate.cpu.a |= (old_carry<<7);
             
-            crapstate.cpu.pc+=1;
-            crapstate.cpu.cycles+=4;
+            badstate.cpu.pc+=1;
+            badstate.cpu.cycles+=4;
             break;
         }
         
         case 0x20:{
             //jr_nz
-            if(!crapstate.cpu.Z){
-                int8_t offset = (int8_t)mem_read_byte(crapstate.cpu.pc+1);
-                crapstate.cpu.pc = crapstate.cpu.pc+2+offset;
+            if(!badstate.cpu.Z){
+                int8_t offset = (int8_t)mem_read_byte(badstate.cpu.pc+1);
+                badstate.cpu.pc = badstate.cpu.pc+2+offset;
                 
-                crapstate.cpu.cycles+=12;
+                badstate.cpu.cycles+=12;
             }else{
-                crapstate.cpu.pc+=2;
-                crapstate.cpu.cycles+=8;
+                badstate.cpu.pc+=2;
+                badstate.cpu.cycles+=8;
             }
             break;
         }
@@ -1388,11 +1388,11 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0x22:{ //LD [HLI], A
-            mem_write_byte(crapstate.cpu.hl, crapstate.cpu.a);
-            crapstate.cpu.hl++;
-            crapstate.cpu.pc++;
+            mem_write_byte(badstate.cpu.hl, badstate.cpu.a);
+            badstate.cpu.hl++;
+            badstate.cpu.pc++;
             
-            crapstate.cpu.cycles+=8;
+            badstate.cpu.cycles+=8;
             break;
         }
         
@@ -1414,70 +1414,70 @@ static void opcodes(uint8_t opcode){
         
         case 0x27:  {  // DAA
             /* The following is from SameBoy. MIT License. */
-            int16_t a = crapstate.cpu.a;
-            if (crapstate.cpu.N) {
-                if (crapstate.cpu.H){
+            int16_t a = badstate.cpu.a;
+            if (badstate.cpu.N) {
+                if (badstate.cpu.H){
                     a = (a - 0x06) & 0xFF;
                 }
                 
-                if (crapstate.cpu.C){
+                if (badstate.cpu.C){
                     a -= 0x60;
                 }
                 
             } else {
-                if (crapstate.cpu.H || (a & 0x0F) > 9){
+                if (badstate.cpu.H || (a & 0x0F) > 9){
                     a += 0x06;
                 }
                 
-                if (crapstate.cpu.C|| a > 0x9F){
+                if (badstate.cpu.C|| a > 0x9F){
                     a += 0x60;
                 }
             }
             
             if ((a & 0x100) == 0x100){
-                crapstate.cpu.C= 1;
+                badstate.cpu.C= 1;
             }
             
-            crapstate.cpu.a = a;
-            crapstate.cpu.Z = (crapstate.cpu.a == 0);
-            crapstate.cpu.H = 0;
-            crapstate.cpu.pc+=1;
-            crapstate.cpu.cycles+=4;
+            badstate.cpu.a = a;
+            badstate.cpu.Z = (badstate.cpu.a == 0);
+            badstate.cpu.H = 0;
+            badstate.cpu.pc+=1;
+            badstate.cpu.cycles+=4;
             
             break;
         }
         
         case 0x28:{ // JR Z
-            if(crapstate.cpu.Z){
-                int8_t offset = (int8_t)mem_read_byte(crapstate.cpu.pc+1);
-                crapstate.cpu.pc = crapstate.cpu.pc+2+offset;
+            if(badstate.cpu.Z){
+                int8_t offset = (int8_t)mem_read_byte(badstate.cpu.pc+1);
+                badstate.cpu.pc = badstate.cpu.pc+2+offset;
                 
-                crapstate.cpu.cycles+=12;
+                badstate.cpu.cycles+=12;
             }else{
-                crapstate.cpu.pc+=2;
-                crapstate.cpu.cycles+=8;
+                badstate.cpu.pc+=2;
+                badstate.cpu.cycles+=8;
             }
             break;
         }
         
         case 0x29: { // ADD HL, HL
-            uint16_t old_hl = crapstate.cpu.hl;
-            crapstate.cpu.hl += crapstate.cpu.hl;
-            crapstate.cpu.N = 0;
-            crapstate.cpu.H = ((old_hl & 0x0FFF) + (old_hl & 0x0FFF)) > 0x0FFF;
-            crapstate.cpu.C = ((uint32_t)old_hl + (uint32_t)old_hl) > 0xFFFF;
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 8;
+            uint16_t old_hl = badstate.cpu.hl;
+            badstate.cpu.hl += badstate.cpu.hl;
+            badstate.cpu.N = 0;
+            badstate.cpu.H = ((old_hl & 0x0FFF) + (old_hl & 0x0FFF)) > 0x0FFF;
+            badstate.cpu.C = ((uint32_t)old_hl + (uint32_t)old_hl) > 0xFFFF;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 8;
             
             break;
         }
         
         case 0x2A: { // LD A, (HL+)
-            crapstate.cpu.a = mem_read_byte(crapstate.cpu.hl);
+            badstate.cpu.a = mem_read_byte(badstate.cpu.hl);
             
-            crapstate.cpu.hl++;
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 8;
+            badstate.cpu.hl++;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 8;
             break;
         }
         
@@ -1498,25 +1498,25 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0x2F: {//CPL
-            crapstate.cpu.a = ~crapstate.cpu.a;
-            crapstate.cpu.H = 1;
-            crapstate.cpu.N = 1;
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles+=4;
+            badstate.cpu.a = ~badstate.cpu.a;
+            badstate.cpu.H = 1;
+            badstate.cpu.N = 1;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles+=4;
             
             break;
         }
         
         case 0x30:{
             //JR NC
-            if(!crapstate.cpu.C){
-                int8_t offset = (int8_t)mem_read_byte(crapstate.cpu.pc+1);
-                crapstate.cpu.pc = crapstate.cpu.pc+2+offset;
+            if(!badstate.cpu.C){
+                int8_t offset = (int8_t)mem_read_byte(badstate.cpu.pc+1);
+                badstate.cpu.pc = badstate.cpu.pc+2+offset;
                 
-                crapstate.cpu.cycles+=12;
+                badstate.cpu.cycles+=12;
             }else{
-                crapstate.cpu.pc+=2;
-                crapstate.cpu.cycles+=8;
+                badstate.cpu.pc+=2;
+                badstate.cpu.cycles+=8;
             }
             break;
         }
@@ -1526,11 +1526,11 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0x32:{// LD HLD, A
-            mem_write_byte(crapstate.cpu.hl, crapstate.cpu.a);
-            crapstate.cpu.hl--;
-            crapstate.cpu.pc++;
+            mem_write_byte(badstate.cpu.hl, badstate.cpu.a);
+            badstate.cpu.hl--;
+            badstate.cpu.pc++;
             
-            crapstate.cpu.cycles+=8;
+            badstate.cpu.cycles+=8;
             break;
         }
         
@@ -1539,85 +1539,85 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0x34: { // INC [HL]
-            uint8_t val = mem_read_byte(crapstate.cpu.hl);
+            uint8_t val = mem_read_byte(badstate.cpu.hl);
             uint8_t result = val + 1;
-            mem_write_byte(crapstate.cpu.hl, result);
+            mem_write_byte(badstate.cpu.hl, result);
             
-            crapstate.cpu.Z = !result;
-            crapstate.cpu.N = 0;
-            crapstate.cpu.H = ((val & 0xF) + 1 > 0xF);
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 12;
+            badstate.cpu.Z = !result;
+            badstate.cpu.N = 0;
+            badstate.cpu.H = ((val & 0xF) + 1 > 0xF);
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 12;
             
             
             break;
         }
         
         case 0x35: { // DEC [HL]
-            uint8_t val = mem_read_byte(crapstate.cpu.hl);
-            crapstate.cpu.H = !(val & 0x0F);
+            uint8_t val = mem_read_byte(badstate.cpu.hl);
+            badstate.cpu.H = !(val & 0x0F);
             uint8_t result = val - 1;
-            mem_write_byte(crapstate.cpu.hl, result);
+            mem_write_byte(badstate.cpu.hl, result);
             
-            crapstate.cpu.Z = !result;
-            crapstate.cpu.N = 1;
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 12;
+            badstate.cpu.Z = !result;
+            badstate.cpu.N = 1;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 12;
             
             
             break;
         }
         
         case 0x36: {// LD [HL],n8
-            uint8_t byte = mem_read_byte(crapstate.cpu.pc+1);
-            mem_write_byte(crapstate.cpu.hl, byte);
-            crapstate.cpu.pc+=2;
-            crapstate.cpu.cycles+=12;
+            uint8_t byte = mem_read_byte(badstate.cpu.pc+1);
+            mem_write_byte(badstate.cpu.hl, byte);
+            badstate.cpu.pc+=2;
+            badstate.cpu.cycles+=12;
             
             break;
         }
         
         case 0x37:  { //SCF
-            crapstate.cpu.C = 1;
-            crapstate.cpu.N = 0;
-            crapstate.cpu.H = 0;
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles+=4;
+            badstate.cpu.C = 1;
+            badstate.cpu.N = 0;
+            badstate.cpu.H = 0;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles+=4;
             
             break;
         }
         
         case 0x38:{ // JR C
-            if(crapstate.cpu.C){
-                int8_t offset = (int8_t)mem_read_byte(crapstate.cpu.pc+1);
-                crapstate.cpu.pc = crapstate.cpu.pc+2+offset;
+            if(badstate.cpu.C){
+                int8_t offset = (int8_t)mem_read_byte(badstate.cpu.pc+1);
+                badstate.cpu.pc = badstate.cpu.pc+2+offset;
                 
-                crapstate.cpu.cycles+=12;
+                badstate.cpu.cycles+=12;
             }else{
-                crapstate.cpu.pc+=2;
-                crapstate.cpu.cycles+=8;
+                badstate.cpu.pc+=2;
+                badstate.cpu.cycles+=8;
             }
             break;
         }
         
         case 0x39:{ // ADD HL, SP
-            uint16_t old_hl = crapstate.cpu.hl;
-            crapstate.cpu.hl += crapstate.cpu.sp;
-            crapstate.cpu.N = 0;
-            crapstate.cpu.H = ((old_hl & 0x0FFF) + (crapstate.cpu.sp & 0x0FFF)) > 0x0FFF;
-            crapstate.cpu.C = ((uint32_t)old_hl + (uint32_t)crapstate.cpu.sp) > 0xFFFF;
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 8;
+            uint16_t old_hl = badstate.cpu.hl;
+            badstate.cpu.hl += badstate.cpu.sp;
+            badstate.cpu.N = 0;
+            badstate.cpu.H = ((old_hl & 0x0FFF) + (badstate.cpu.sp & 0x0FFF)) > 0x0FFF;
+            badstate.cpu.C = ((uint32_t)old_hl + (uint32_t)badstate.cpu.sp) > 0xFFFF;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 8;
             
             break;
         }
         
         case 0x3A: { // LD A, HLD
-            crapstate.cpu.a = mem_read_byte(crapstate.cpu.hl);
+            badstate.cpu.a = mem_read_byte(badstate.cpu.hl);
             
-            crapstate.cpu.hl--;
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 8;
+            badstate.cpu.hl--;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 8;
             break;
         }
         
@@ -1638,12 +1638,12 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0x3F:  {//CCF
-            crapstate.cpu.C = !crapstate.cpu.C;
-            crapstate.cpu.N = 0;
-            crapstate.cpu.H = 0;
-            crapstate.cpu.pc++;
+            badstate.cpu.C = !badstate.cpu.C;
+            badstate.cpu.N = 0;
+            badstate.cpu.H = 0;
+            badstate.cpu.pc++;
             
-            crapstate.cpu.cycles += 4;
+            badstate.cpu.cycles += 4;
             break;
         }
         
@@ -1866,19 +1866,19 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0x76: {// HALT
-            crapstate.cpu.cycles = UINT16_MAX;
-            crapstate.cpu.halted = 1;
-            if((crapstate.io.ie&crapstate.io.ie & INTERRUPT_VBLANK) |(crapstate.io.ie&crapstate.io.ie & INTERRUPT_STAT)){
-                crapstate.cpu.cycles = crapstate.ppu.mode_cycles; // i dunno if it needs full proper calculation of cycles until interrupt 
+            badstate.cpu.cycles = UINT16_MAX;
+            badstate.cpu.halted = 1;
+            if((badstate.io.ie&badstate.io.ie & INTERRUPT_VBLANK) |(badstate.io.ie&badstate.io.ie & INTERRUPT_STAT)){
+                badstate.cpu.cycles = badstate.ppu.mode_cycles; // i dunno if it needs full proper calculation of cycles until interrupt 
                 // this will do for now
             }
             
             static const uint16_t tac_treshhold[4] = {1024, 16, 64, 256};
-            if(crapstate.io.ie & crapstate.io.TAC & INTERRUPT_TIMER ){
+            if(badstate.io.ie & badstate.io.TAC & INTERRUPT_TIMER ){
                 
-                uint16_t tima_cycles = (256 - crapstate.io.TIMA) * tac_treshhold[ crapstate.io.TAC & 0x03];
-                if((crapstate.cpu.cycles> tima_cycles) && tima_cycles!= 0){ // i have to deal with this some other way dont know how yet
-                    crapstate.cpu.cycles = tima_cycles;
+                uint16_t tima_cycles = (256 - badstate.io.TIMA) * tac_treshhold[ badstate.io.TAC & 0x03];
+                if((badstate.cpu.cycles> tima_cycles) && tima_cycles!= 0){ // i have to deal with this some other way dont know how yet
+                    badstate.cpu.cycles = tima_cycles;
                 }
             }
             
@@ -1886,9 +1886,9 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0x77:{ //LD [HL], A
-            mem_write_byte(crapstate.cpu.hl,crapstate.cpu.a);
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles+=8;
+            mem_write_byte(badstate.cpu.hl,badstate.cpu.a);
+            badstate.cpu.pc++;
+            badstate.cpu.cycles+=8;
             
             break;
         }
@@ -1950,15 +1950,15 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0x86: { // ADD A,[HL] 
-            uint8_t old_a = crapstate.cpu.a;
-            uint8_t byte = mem_read_byte(crapstate.cpu.hl);
-            crapstate.cpu.a += byte;
-            crapstate.cpu.Z = !crapstate.cpu.a;
-            crapstate.cpu.N = 0;
-            crapstate.cpu.H = ((old_a & 0x0F) + (byte & 0x0F)) > 0x0F;
-            crapstate.cpu.C = old_a > crapstate.cpu.a;
-            crapstate.cpu.pc+=1;
-            crapstate.cpu.cycles += 8;
+            uint8_t old_a = badstate.cpu.a;
+            uint8_t byte = mem_read_byte(badstate.cpu.hl);
+            badstate.cpu.a += byte;
+            badstate.cpu.Z = !badstate.cpu.a;
+            badstate.cpu.N = 0;
+            badstate.cpu.H = ((old_a & 0x0F) + (byte & 0x0F)) > 0x0F;
+            badstate.cpu.C = old_a > badstate.cpu.a;
+            badstate.cpu.pc+=1;
+            badstate.cpu.cycles += 8;
             
             break;
         }
@@ -1993,17 +1993,17 @@ static void opcodes(uint8_t opcode){
         
         case 0x8E: { //ADC A,[HL]
             
-            uint8_t old_a = crapstate.cpu.a;          
-            uint8_t value = mem_read_byte(crapstate.cpu.hl);  
-            uint16_t result = old_a + value + crapstate.cpu.C; 
+            uint8_t old_a = badstate.cpu.a;          
+            uint8_t value = mem_read_byte(badstate.cpu.hl);  
+            uint16_t result = old_a + value + badstate.cpu.C; 
             
-            crapstate.cpu.a = (uint8_t)result;        
-            crapstate.cpu.Z = (crapstate.cpu.a == 0); 
-            crapstate.cpu.N = 0;                      
-            crapstate.cpu.H = ((old_a & 0xF) + (value & 0xF) + crapstate.cpu.C) > 0xF;  
-            crapstate.cpu.C = (result > 0xFF);        
-            crapstate.cpu.pc+=1;
-            crapstate.cpu.cycles += 8;
+            badstate.cpu.a = (uint8_t)result;        
+            badstate.cpu.Z = (badstate.cpu.a == 0); 
+            badstate.cpu.N = 0;                      
+            badstate.cpu.H = ((old_a & 0xF) + (value & 0xF) + badstate.cpu.C) > 0xF;  
+            badstate.cpu.C = (result > 0xFF);        
+            badstate.cpu.pc+=1;
+            badstate.cpu.cycles += 8;
             
             break;
             
@@ -2038,26 +2038,26 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0x96: { //SUB A [HL]
-            uint8_t subval = mem_read_byte(crapstate.cpu.hl);
-            crapstate.cpu.C = subval > crapstate.cpu.a;
-            crapstate.cpu.H = (crapstate.cpu.a & 0x0F) < (subval & 0x0F);
-            crapstate.cpu.a = crapstate.cpu.a - subval;
-            crapstate.cpu.Z = !crapstate.cpu.a;
-            crapstate.cpu.N = 1;
-            crapstate.cpu.cycles+=8;
-            crapstate.cpu.pc+=1;
+            uint8_t subval = mem_read_byte(badstate.cpu.hl);
+            badstate.cpu.C = subval > badstate.cpu.a;
+            badstate.cpu.H = (badstate.cpu.a & 0x0F) < (subval & 0x0F);
+            badstate.cpu.a = badstate.cpu.a - subval;
+            badstate.cpu.Z = !badstate.cpu.a;
+            badstate.cpu.N = 1;
+            badstate.cpu.cycles+=8;
+            badstate.cpu.pc+=1;
             
             break;
         }
         
         case 0x97:  { //SUB A, A
-            crapstate.cpu.C = 0;
-            crapstate.cpu.H = 0;
-            crapstate.cpu.a = 0;
-            crapstate.cpu.Z = 1;
-            crapstate.cpu.N = 1;
-            crapstate.cpu.cycles+=4;
-            crapstate.cpu.pc+=1;
+            badstate.cpu.C = 0;
+            badstate.cpu.H = 0;
+            badstate.cpu.a = 0;
+            badstate.cpu.Z = 1;
+            badstate.cpu.N = 1;
+            badstate.cpu.cycles+=4;
+            badstate.cpu.pc+=1;
             
             break;
         }
@@ -2089,15 +2089,15 @@ static void opcodes(uint8_t opcode){
         
         case 0x9E:  { //SBC A,[HL]
             /* PeanutGB code MIT licence*/
-            uint8_t byte  = mem_read_byte(crapstate.cpu.hl);
-            uint16_t temp =  crapstate.cpu.a - (byte + crapstate.cpu.C);          
-            crapstate.cpu.C = (temp & 0xFF00) ? 1 : 0;                                   
-            crapstate.cpu.H = ((crapstate.cpu.a ^ byte ^ temp) & 0x10) > 0;        
-            crapstate.cpu.N = 1;                                                         
-            crapstate.cpu.Z = ((temp & 0xFF) == 0x00);                                   
-            crapstate.cpu.a = (temp & 0xFF);                                             
-            crapstate.cpu.pc += 1;                                                       
-            crapstate.cpu.cycles += 8;                                                   
+            uint8_t byte  = mem_read_byte(badstate.cpu.hl);
+            uint16_t temp =  badstate.cpu.a - (byte + badstate.cpu.C);          
+            badstate.cpu.C = (temp & 0xFF00) ? 1 : 0;                                   
+            badstate.cpu.H = ((badstate.cpu.a ^ byte ^ temp) & 0x10) > 0;        
+            badstate.cpu.N = 1;                                                         
+            badstate.cpu.Z = ((temp & 0xFF) == 0x00);                                   
+            badstate.cpu.a = (temp & 0xFF);                                             
+            badstate.cpu.pc += 1;                                                       
+            badstate.cpu.cycles += 8;                                                   
             break;
         }
         
@@ -2130,26 +2130,26 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0xA6: { // AND A, [HL]
-            uint8_t byte = mem_read_byte(crapstate.cpu.hl);
-            crapstate.cpu.a &= byte;
-            crapstate.cpu.H = 1;
-            crapstate.cpu.N = 0;
-            crapstate.cpu.C = 0;
-            crapstate.cpu.Z = !crapstate.cpu.a;
+            uint8_t byte = mem_read_byte(badstate.cpu.hl);
+            badstate.cpu.a &= byte;
+            badstate.cpu.H = 1;
+            badstate.cpu.N = 0;
+            badstate.cpu.C = 0;
+            badstate.cpu.Z = !badstate.cpu.a;
             
-            crapstate.cpu.pc += 1;
-            crapstate.cpu.cycles += 8;
+            badstate.cpu.pc += 1;
+            badstate.cpu.cycles += 8;
             break;
         }
         
         case 0xA7: { // AND A, A
-            crapstate.cpu.H = 1;
-            crapstate.cpu.N = 0;
-            crapstate.cpu.C = 0;
-            crapstate.cpu.Z = !crapstate.cpu.a;
+            badstate.cpu.H = 1;
+            badstate.cpu.N = 0;
+            badstate.cpu.C = 0;
+            badstate.cpu.Z = !badstate.cpu.a;
             
-            crapstate.cpu.pc += 1;
-            crapstate.cpu.cycles += 4;
+            badstate.cpu.pc += 1;
+            badstate.cpu.cycles += 4;
             break;
         }
         
@@ -2178,23 +2178,23 @@ static void opcodes(uint8_t opcode){
         }        
         
         case 0xAE : { //XOR A, [HL]
-            uint8_t byte = mem_read_byte(crapstate.cpu.hl);
-            crapstate.cpu.a ^= byte;
-            crapstate.cpu.f = 0;
-            crapstate.cpu.Z = !crapstate.cpu.a;
+            uint8_t byte = mem_read_byte(badstate.cpu.hl);
+            badstate.cpu.a ^= byte;
+            badstate.cpu.f = 0;
+            badstate.cpu.Z = !badstate.cpu.a;
             
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 8;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 8;
             
             break;
         }
         
         case 0xAF: { // XOR A
-            crapstate.cpu.a = 0;
-            crapstate.cpu.f = 0;
-            crapstate.cpu.Z = 1;
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 4;
+            badstate.cpu.a = 0;
+            badstate.cpu.f = 0;
+            badstate.cpu.Z = 1;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 4;
             
             break;
         }
@@ -2224,21 +2224,21 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0xB6: { // OR A, [HL]
-            uint8_t byte = mem_read_byte(crapstate.cpu.hl);
-            crapstate.cpu.a = crapstate.cpu.a | byte;
-            crapstate.cpu.f = 0;
-            crapstate.cpu.Z = !crapstate.cpu.a;
-            crapstate.cpu.pc+=1;
-            crapstate.cpu.cycles += 8;
+            uint8_t byte = mem_read_byte(badstate.cpu.hl);
+            badstate.cpu.a = badstate.cpu.a | byte;
+            badstate.cpu.f = 0;
+            badstate.cpu.Z = !badstate.cpu.a;
+            badstate.cpu.pc+=1;
+            badstate.cpu.cycles += 8;
             
             break;
         }
         
         case 0xB7: {// OR A,A
-            crapstate.cpu.f = 0;
-            crapstate.cpu.Z = !crapstate.cpu.a;
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 4;
+            badstate.cpu.f = 0;
+            badstate.cpu.Z = !badstate.cpu.a;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 4;
             
             break;
         }
@@ -2268,38 +2268,38 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0xBE:  { // CP A, [HL]
-            uint8_t cpval = mem_read_byte(crapstate.cpu.hl);
-            uint8_t res = crapstate.cpu.a - cpval;
-            crapstate.cpu.Z = !res;
-            crapstate.cpu.N = 1;
-            crapstate.cpu.C = cpval > crapstate.cpu.a;
-            crapstate.cpu.H = (crapstate.cpu.a & 0x0F) < (cpval & 0x0F);
-            crapstate.cpu.cycles+=8;
-            crapstate.cpu.pc+=1;
+            uint8_t cpval = mem_read_byte(badstate.cpu.hl);
+            uint8_t res = badstate.cpu.a - cpval;
+            badstate.cpu.Z = !res;
+            badstate.cpu.N = 1;
+            badstate.cpu.C = cpval > badstate.cpu.a;
+            badstate.cpu.H = (badstate.cpu.a & 0x0F) < (cpval & 0x0F);
+            badstate.cpu.cycles+=8;
+            badstate.cpu.pc+=1;
             
             break;
         }
         
         case 0xBF:  {// CP A, A
-            crapstate.cpu.f = 0;
-            crapstate.cpu.Z = 1;
-            crapstate.cpu.N = 1;
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles+=4;
+            badstate.cpu.f = 0;
+            badstate.cpu.Z = 1;
+            badstate.cpu.N = 1;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles+=4;
             
             break;
         }
         
         case 0xC0: { // RET NZ
-            if (!crapstate.cpu.Z) {
-                uint8_t low = mem_read_byte(crapstate.cpu.sp++);
-                uint8_t high = mem_read_byte(crapstate.cpu.sp++);
-                crapstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
+            if (!badstate.cpu.Z) {
+                uint8_t low = mem_read_byte(badstate.cpu.sp++);
+                uint8_t high = mem_read_byte(badstate.cpu.sp++);
+                badstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
                 
-                crapstate.cpu.cycles += 20;
+                badstate.cpu.cycles += 20;
             } else {
-                crapstate.cpu.pc++;
-                crapstate.cpu.cycles += 8;
+                badstate.cpu.pc++;
+                badstate.cpu.cycles += 8;
             }
             break;
         }
@@ -2310,37 +2310,37 @@ static void opcodes(uint8_t opcode){
         
         case 0xC2:{
             //JP NZ
-            if(!crapstate.cpu.Z){
-                crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc+1);
+            if(!badstate.cpu.Z){
+                badstate.cpu.pc = mem_read_word(badstate.cpu.pc+1);
                 
-                crapstate.cpu.cycles+=16;
+                badstate.cpu.cycles+=16;
             }else{
-                crapstate.cpu.pc+=3;
-                crapstate.cpu.cycles+=12;
+                badstate.cpu.pc+=3;
+                badstate.cpu.cycles+=12;
             }
             break;
         }
         
         case 0xC3: { // JP nn
-            crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc + 1);
+            badstate.cpu.pc = mem_read_word(badstate.cpu.pc + 1);
             
-            crapstate.cpu.cycles += 16;
+            badstate.cpu.cycles += 16;
             break;
         }
         
         case 0xC4: { // CALL NZ
-            if (!crapstate.cpu.Z) {
-                crapstate.cpu.sp--;
-                mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) >> 8); // High byte
-                crapstate.cpu.sp--;
-                mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) & 0xFF); // Low byte
+            if (!badstate.cpu.Z) {
+                badstate.cpu.sp--;
+                mem_write_byte(badstate.cpu.sp, (badstate.cpu.pc + 3) >> 8); // High byte
+                badstate.cpu.sp--;
+                mem_write_byte(badstate.cpu.sp, (badstate.cpu.pc + 3) & 0xFF); // Low byte
                 
-                crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc + 1);
+                badstate.cpu.pc = mem_read_word(badstate.cpu.pc + 1);
                 
-                crapstate.cpu.cycles += 24;
+                badstate.cpu.cycles += 24;
             } else {
-                crapstate.cpu.pc+=3;
-                crapstate.cpu.cycles += 12;
+                badstate.cpu.pc+=3;
+                badstate.cpu.cycles += 12;
             }
             break;
         }
@@ -2350,15 +2350,15 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0xC6: { // ADD A, n8
-            uint8_t old_a = crapstate.cpu.a;
-            uint8_t byte = mem_read_byte(crapstate.cpu.pc+1);
-            crapstate.cpu.a += byte;
-            crapstate.cpu.Z = !crapstate.cpu.a;
-            crapstate.cpu.N = 0;
-            crapstate.cpu.H = ((old_a & 0x0F) + (byte & 0x0F)) > 0x0F;
-            crapstate.cpu.C = old_a > crapstate.cpu.a;
-            crapstate.cpu.pc+=2;
-            crapstate.cpu.cycles += 8;
+            uint8_t old_a = badstate.cpu.a;
+            uint8_t byte = mem_read_byte(badstate.cpu.pc+1);
+            badstate.cpu.a += byte;
+            badstate.cpu.Z = !badstate.cpu.a;
+            badstate.cpu.N = 0;
+            badstate.cpu.H = ((old_a & 0x0F) + (byte & 0x0F)) > 0x0F;
+            badstate.cpu.C = old_a > badstate.cpu.a;
+            badstate.cpu.pc+=2;
+            badstate.cpu.cycles += 8;
             
             break;
         }
@@ -2368,89 +2368,89 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0xC8: { // RET Z
-            if (crapstate.cpu.Z) {
-                uint8_t low = mem_read_byte(crapstate.cpu.sp++);
-                uint8_t high = mem_read_byte(crapstate.cpu.sp++);
-                crapstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
+            if (badstate.cpu.Z) {
+                uint8_t low = mem_read_byte(badstate.cpu.sp++);
+                uint8_t high = mem_read_byte(badstate.cpu.sp++);
+                badstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
                 
-                crapstate.cpu.cycles += 20;
+                badstate.cpu.cycles += 20;
             } else {
-                crapstate.cpu.pc++;
-                crapstate.cpu.cycles += 8;
+                badstate.cpu.pc++;
+                badstate.cpu.cycles += 8;
             }
             break;
         }
         
         case 0xC9: { // RET
-            uint8_t low = mem_read_byte(crapstate.cpu.sp++);
-            uint8_t high = mem_read_byte(crapstate.cpu.sp++);
-            crapstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
+            uint8_t low = mem_read_byte(badstate.cpu.sp++);
+            uint8_t high = mem_read_byte(badstate.cpu.sp++);
+            badstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
             
-            crapstate.cpu.cycles += 16;
+            badstate.cpu.cycles += 16;
             break;
         }
         
         case 0xCA:  { //JP Z
-            if(crapstate.cpu.Z){
-                crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc+1);
+            if(badstate.cpu.Z){
+                badstate.cpu.pc = mem_read_word(badstate.cpu.pc+1);
                 
-                crapstate.cpu.cycles+=16;
+                badstate.cpu.cycles+=16;
             }else{
-                crapstate.cpu.pc+=3;
-                crapstate.cpu.cycles+=12;
+                badstate.cpu.pc+=3;
+                badstate.cpu.cycles+=12;
             }
             break;
         }
         
         case 0xCB: {// CB postcodes
-            opcodes_cb(mem_read_byte(crapstate.cpu.pc+1));
-            crapstate.cpu.pc +=2;
-            crapstate.cpu.cycles+=8;
+            opcodes_cb(mem_read_byte(badstate.cpu.pc+1));
+            badstate.cpu.pc +=2;
+            badstate.cpu.cycles+=8;
             break;
         }
         
         case 0xCC: { // CALL Z
-            if (crapstate.cpu.Z) {
-                crapstate.cpu.sp--;
-                mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) >> 8); // High byte
-                crapstate.cpu.sp--;
-                mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) & 0xFF); // Low byte
+            if (badstate.cpu.Z) {
+                badstate.cpu.sp--;
+                mem_write_byte(badstate.cpu.sp, (badstate.cpu.pc + 3) >> 8); // High byte
+                badstate.cpu.sp--;
+                mem_write_byte(badstate.cpu.sp, (badstate.cpu.pc + 3) & 0xFF); // Low byte
                 
-                crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc + 1);
+                badstate.cpu.pc = mem_read_word(badstate.cpu.pc + 1);
                 
-                crapstate.cpu.cycles += 24;
+                badstate.cpu.cycles += 24;
             } else {
-                crapstate.cpu.pc+=3;
-                crapstate.cpu.cycles += 12;
+                badstate.cpu.pc+=3;
+                badstate.cpu.cycles += 12;
             }
             break;
         }
         
         case 0xCD: { // CALL nn
-            crapstate.cpu.sp--;
-            mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) >> 8); // High byte
-            crapstate.cpu.sp--;
-            mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) & 0xFF); // Low byte
+            badstate.cpu.sp--;
+            mem_write_byte(badstate.cpu.sp, (badstate.cpu.pc + 3) >> 8); // High byte
+            badstate.cpu.sp--;
+            mem_write_byte(badstate.cpu.sp, (badstate.cpu.pc + 3) & 0xFF); // Low byte
             
-            crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc + 1);
+            badstate.cpu.pc = mem_read_word(badstate.cpu.pc + 1);
             
-            crapstate.cpu.cycles += 24;
+            badstate.cpu.cycles += 24;
             break;
         }
         
         case 0xCE: { //ADC A,n8
             
-            uint8_t old_a = crapstate.cpu.a;          // 0x00
-            uint8_t byte = mem_read_byte(crapstate.cpu.pc+1);
-            uint16_t result = old_a + byte + crapstate.cpu.C;  // 0x00 + 0xFF + 1 = 0x0100
+            uint8_t old_a = badstate.cpu.a;          // 0x00
+            uint8_t byte = mem_read_byte(badstate.cpu.pc+1);
+            uint16_t result = old_a + byte + badstate.cpu.C;  // 0x00 + 0xFF + 1 = 0x0100
             
-            crapstate.cpu.a = (uint8_t)result;        // 0x00
-            crapstate.cpu.Z = (crapstate.cpu.a == 0); 
-            crapstate.cpu.N = 0;                      // Always 0 for ADC
-            crapstate.cpu.H = ((old_a & 0xF) + (byte & 0xF) + crapstate.cpu.C) > 0xF;  // 1
-            crapstate.cpu.C = (result > 0xFF);        // 1
-            crapstate.cpu.pc+=2;
-            crapstate.cpu.cycles += 8;
+            badstate.cpu.a = (uint8_t)result;        // 0x00
+            badstate.cpu.Z = (badstate.cpu.a == 0); 
+            badstate.cpu.N = 0;                      // Always 0 for ADC
+            badstate.cpu.H = ((old_a & 0xF) + (byte & 0xF) + badstate.cpu.C) > 0xF;  // 1
+            badstate.cpu.C = (result > 0xFF);        // 1
+            badstate.cpu.pc+=2;
+            badstate.cpu.cycles += 8;
             
             break;
             
@@ -2462,15 +2462,15 @@ static void opcodes(uint8_t opcode){
         
         
         case 0xD0: { // RET NC
-            if (!crapstate.cpu.C) {
-                uint8_t low = mem_read_byte(crapstate.cpu.sp++);
-                uint8_t high = mem_read_byte(crapstate.cpu.sp++);
-                crapstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
+            if (!badstate.cpu.C) {
+                uint8_t low = mem_read_byte(badstate.cpu.sp++);
+                uint8_t high = mem_read_byte(badstate.cpu.sp++);
+                badstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
                 
-                crapstate.cpu.cycles += 20;
+                badstate.cpu.cycles += 20;
             } else {
-                crapstate.cpu.pc++;
-                crapstate.cpu.cycles += 8;
+                badstate.cpu.pc++;
+                badstate.cpu.cycles += 8;
             }
             break;
         }
@@ -2481,13 +2481,13 @@ static void opcodes(uint8_t opcode){
         
         case 0xD2:{
             //JP NC
-            if(!crapstate.cpu.C){
-                crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc+1);
+            if(!badstate.cpu.C){
+                badstate.cpu.pc = mem_read_word(badstate.cpu.pc+1);
                 
-                crapstate.cpu.cycles+=16;
+                badstate.cpu.cycles+=16;
             }else{
-                crapstate.cpu.pc+=3;
-                crapstate.cpu.cycles+=12;
+                badstate.cpu.pc+=3;
+                badstate.cpu.cycles+=12;
             }
             break;
         }
@@ -2498,18 +2498,18 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0xD4: { // CALL NC
-            if (!crapstate.cpu.C) {
-                crapstate.cpu.sp--;
-                mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) >> 8); // High byte
-                crapstate.cpu.sp--;
-                mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) & 0xFF); // Low byte
+            if (!badstate.cpu.C) {
+                badstate.cpu.sp--;
+                mem_write_byte(badstate.cpu.sp, (badstate.cpu.pc + 3) >> 8); // High byte
+                badstate.cpu.sp--;
+                mem_write_byte(badstate.cpu.sp, (badstate.cpu.pc + 3) & 0xFF); // Low byte
                 
-                crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc + 1);
+                badstate.cpu.pc = mem_read_word(badstate.cpu.pc + 1);
                 
-                crapstate.cpu.cycles += 24;
+                badstate.cpu.cycles += 24;
             } else {
-                crapstate.cpu.pc+=3;
-                crapstate.cpu.cycles += 12;
+                badstate.cpu.pc+=3;
+                badstate.cpu.cycles += 12;
             }
             break;
         }
@@ -2520,14 +2520,14 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0xD6: { //SUB A N8
-            uint8_t subval = mem_read_byte(crapstate.cpu.pc+1);
-            crapstate.cpu.C = subval > crapstate.cpu.a;
-            crapstate.cpu.H = (crapstate.cpu.a & 0x0F) < (subval & 0x0F);
-            crapstate.cpu.a = crapstate.cpu.a - subval;
-            crapstate.cpu.Z = !crapstate.cpu.a;
-            crapstate.cpu.N = 1;
-            crapstate.cpu.cycles+=8;
-            crapstate.cpu.pc+=2;
+            uint8_t subval = mem_read_byte(badstate.cpu.pc+1);
+            badstate.cpu.C = subval > badstate.cpu.a;
+            badstate.cpu.H = (badstate.cpu.a & 0x0F) < (subval & 0x0F);
+            badstate.cpu.a = badstate.cpu.a - subval;
+            badstate.cpu.Z = !badstate.cpu.a;
+            badstate.cpu.N = 1;
+            badstate.cpu.cycles+=8;
+            badstate.cpu.pc+=2;
             
             break;
         }
@@ -2537,38 +2537,38 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0xD8: { // RET C
-            if (crapstate.cpu.C) {
-                uint8_t low = mem_read_byte(crapstate.cpu.sp++);
-                uint8_t high = mem_read_byte(crapstate.cpu.sp++);
-                crapstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
+            if (badstate.cpu.C) {
+                uint8_t low = mem_read_byte(badstate.cpu.sp++);
+                uint8_t high = mem_read_byte(badstate.cpu.sp++);
+                badstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
                 
-                crapstate.cpu.cycles += 20;
+                badstate.cpu.cycles += 20;
             } else {
-                crapstate.cpu.pc++;
-                crapstate.cpu.cycles += 8;
+                badstate.cpu.pc++;
+                badstate.cpu.cycles += 8;
             }
             break;
         }
         
         case 0xD9:  { // RETI
-            uint8_t low = mem_read_byte(crapstate.cpu.sp++);
-            uint8_t high = mem_read_byte(crapstate.cpu.sp++);
-            crapstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
+            uint8_t low = mem_read_byte(badstate.cpu.sp++);
+            uint8_t high = mem_read_byte(badstate.cpu.sp++);
+            badstate.cpu.pc = (uint16_t)low | ((uint16_t)high << 8);
             
-            crapstate.cpu.ime = 1;
-            crapstate.cpu.cycles += 16;
+            badstate.cpu.ime = 1;
+            badstate.cpu.cycles += 16;
             break;
         }
         
         case 0xDA:  {
             //JP C
-            if(crapstate.cpu.C){
-                crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc+1);
+            if(badstate.cpu.C){
+                badstate.cpu.pc = mem_read_word(badstate.cpu.pc+1);
                 
-                crapstate.cpu.cycles+=16;
+                badstate.cpu.cycles+=16;
             }else{
-                crapstate.cpu.pc+=3;
-                crapstate.cpu.cycles+=12;
+                badstate.cpu.pc+=3;
+                badstate.cpu.cycles+=12;
             }
             break;
         }
@@ -2579,18 +2579,18 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0xDC:  {//CALL C
-            if (crapstate.cpu.C) {
-                crapstate.cpu.sp--;
-                mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) >> 8); // High byte
-                crapstate.cpu.sp--;
-                mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 3) & 0xFF); // Low byte
+            if (badstate.cpu.C) {
+                badstate.cpu.sp--;
+                mem_write_byte(badstate.cpu.sp, (badstate.cpu.pc + 3) >> 8); // High byte
+                badstate.cpu.sp--;
+                mem_write_byte(badstate.cpu.sp, (badstate.cpu.pc + 3) & 0xFF); // Low byte
                 
-                crapstate.cpu.pc = mem_read_word(crapstate.cpu.pc + 1);
+                badstate.cpu.pc = mem_read_word(badstate.cpu.pc + 1);
                 
-                crapstate.cpu.cycles += 24;
+                badstate.cpu.cycles += 24;
             } else {
-                crapstate.cpu.pc+=3;
-                crapstate.cpu.cycles += 12;
+                badstate.cpu.pc+=3;
+                badstate.cpu.cycles += 12;
             }
             break;
         }
@@ -2606,26 +2606,26 @@ static void opcodes(uint8_t opcode){
         
         case 0xDE:  { //SBC A, n8
             /*PeanutGB code MIT licence*/
-            uint8_t byte  = mem_read_byte(crapstate.cpu.pc+1);
-            uint16_t temp =  crapstate.cpu.a - (byte + crapstate.cpu.C);          
-            crapstate.cpu.C = (temp & 0xFF00) ? 1 : 0;                                   
-            crapstate.cpu.H = ((crapstate.cpu.a ^ byte ^ temp) & 0x10) > 0;        
-            crapstate.cpu.N = 1;                                                         
-            crapstate.cpu.Z = ((temp & 0xFF) == 0x00);                                   
-            crapstate.cpu.a = (temp & 0xFF);     
-            crapstate.cpu.N = 1;
-            crapstate.cpu.pc +=2;
-            crapstate.cpu.cycles+=8;
+            uint8_t byte  = mem_read_byte(badstate.cpu.pc+1);
+            uint16_t temp =  badstate.cpu.a - (byte + badstate.cpu.C);          
+            badstate.cpu.C = (temp & 0xFF00) ? 1 : 0;                                   
+            badstate.cpu.H = ((badstate.cpu.a ^ byte ^ temp) & 0x10) > 0;        
+            badstate.cpu.N = 1;                                                         
+            badstate.cpu.Z = ((temp & 0xFF) == 0x00);                                   
+            badstate.cpu.a = (temp & 0xFF);     
+            badstate.cpu.N = 1;
+            badstate.cpu.pc +=2;
+            badstate.cpu.cycles+=8;
             
             break;
         }
         
         case 0xE0: { // LDH (n), A
-            uint16_t addr = 0xFF00 + mem_read_byte(crapstate.cpu.pc + 1);
-            mem_write_byte(addr, crapstate.cpu.a);
+            uint16_t addr = 0xFF00 + mem_read_byte(badstate.cpu.pc + 1);
+            mem_write_byte(addr, badstate.cpu.a);
             
-            crapstate.cpu.pc += 2;
-            crapstate.cpu.cycles += 12;
+            badstate.cpu.pc += 2;
+            badstate.cpu.cycles += 12;
             break;
         }
         
@@ -2634,11 +2634,11 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0xE2: { //LDH [C],A
-            uint16_t addr = 0xFF00 + crapstate.cpu.c;
-            mem_write_byte(addr, crapstate.cpu.a);
+            uint16_t addr = 0xFF00 + badstate.cpu.c;
+            mem_write_byte(addr, badstate.cpu.a);
             
-            crapstate.cpu.pc += 1;
-            crapstate.cpu.cycles += 8;
+            badstate.cpu.pc += 1;
+            badstate.cpu.cycles += 8;
             break;
         }
         
@@ -2657,14 +2657,14 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0xE6: { // AND A, n
-            uint8_t val = mem_read_byte(crapstate.cpu.pc + 1);
-            crapstate.cpu.a &= val;
-            crapstate.cpu.f = 0;
-            crapstate.cpu.H = 1;
-            crapstate.cpu.Z = !crapstate.cpu.a;
+            uint8_t val = mem_read_byte(badstate.cpu.pc + 1);
+            badstate.cpu.a &= val;
+            badstate.cpu.f = 0;
+            badstate.cpu.H = 1;
+            badstate.cpu.Z = !badstate.cpu.a;
             
-            crapstate.cpu.pc += 2;
-            crapstate.cpu.cycles += 8;
+            badstate.cpu.pc += 2;
+            badstate.cpu.cycles += 8;
             break;
         }
         
@@ -2674,31 +2674,31 @@ static void opcodes(uint8_t opcode){
         
         case 0xE8:  {//ADD SP, s8
             //Sameboy code MIT licence
-            int8_t offset = (int8_t) mem_read_byte( crapstate.cpu.pc+1);
-            crapstate.cpu.Z = 0;
-            crapstate.cpu.N = 0;
-            crapstate.cpu.H = ((crapstate.cpu.sp & 0xF) + (offset & 0xF) > 0xF) ? 1 : 0;
-            crapstate.cpu.C = ((crapstate.cpu.sp & 0xFF) + (offset & 0xFF) > 0xFF) ? 1 : 0;
-            crapstate.cpu.sp += offset;
-            crapstate.cpu.pc += 2;
-            crapstate.cpu.cycles += 16;
+            int8_t offset = (int8_t) mem_read_byte( badstate.cpu.pc+1);
+            badstate.cpu.Z = 0;
+            badstate.cpu.N = 0;
+            badstate.cpu.H = ((badstate.cpu.sp & 0xF) + (offset & 0xF) > 0xF) ? 1 : 0;
+            badstate.cpu.C = ((badstate.cpu.sp & 0xFF) + (offset & 0xFF) > 0xFF) ? 1 : 0;
+            badstate.cpu.sp += offset;
+            badstate.cpu.pc += 2;
+            badstate.cpu.cycles += 16;
             
             break;
         }
         
         case 0xE9: { // JP HL
-            crapstate.cpu.pc = crapstate.cpu.hl;
+            badstate.cpu.pc = badstate.cpu.hl;
             
-            crapstate.cpu.cycles += 4;
+            badstate.cpu.cycles += 4;
             break;
         }
         
         case 0xEA: { // LD (nn), A
-            uint16_t addr = mem_read_word(crapstate.cpu.pc + 1);
-            mem_write_byte(addr, crapstate.cpu.a);
+            uint16_t addr = mem_read_word(badstate.cpu.pc + 1);
+            mem_write_byte(addr, badstate.cpu.a);
             
-            crapstate.cpu.pc += 3;
-            crapstate.cpu.cycles += 16;
+            badstate.cpu.pc += 3;
+            badstate.cpu.cycles += 16;
             break;
         }
         
@@ -2718,12 +2718,12 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0xEE:  { //XOR A, n8
-            uint8_t byte  = mem_read_byte(crapstate.cpu.pc+1);
-            crapstate.cpu.a ^= byte;
-            crapstate.cpu.f = 0;
-            crapstate.cpu.Z = !crapstate.cpu.a; 
-            crapstate.cpu.pc+=2;
-            crapstate.cpu.cycles+=8;
+            uint8_t byte  = mem_read_byte(badstate.cpu.pc+1);
+            badstate.cpu.a ^= byte;
+            badstate.cpu.f = 0;
+            badstate.cpu.Z = !badstate.cpu.a; 
+            badstate.cpu.pc+=2;
+            badstate.cpu.cycles+=8;
             
             break;
         }
@@ -2734,37 +2734,37 @@ static void opcodes(uint8_t opcode){
         
         
         case 0xF0: { // LDH A, (n)
-            uint16_t addr = 0xFF00 + mem_read_byte(crapstate.cpu.pc + 1);
-            crapstate.cpu.a = mem_read_byte(addr);
+            uint16_t addr = 0xFF00 + mem_read_byte(badstate.cpu.pc + 1);
+            badstate.cpu.a = mem_read_byte(addr);
             
-            crapstate.cpu.pc += 2;
-            crapstate.cpu.cycles += 12;
+            badstate.cpu.pc += 2;
+            badstate.cpu.cycles += 12;
             break;
         }
         
         case 0xF1: { //POP AF
-            uint8_t low = mem_read_byte(crapstate.cpu.sp++);
-            uint8_t high = mem_read_byte(crapstate.cpu.sp++);
-            crapstate.cpu.af = (uint16_t)(low & 0xf0) | ((uint16_t)high << 8);
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles+=12;
+            uint8_t low = mem_read_byte(badstate.cpu.sp++);
+            uint8_t high = mem_read_byte(badstate.cpu.sp++);
+            badstate.cpu.af = (uint16_t)(low & 0xf0) | ((uint16_t)high << 8);
+            badstate.cpu.pc++;
+            badstate.cpu.cycles+=12;
             
             break;
         }
         
         case 0xF2: { //LDH A, [C]
-            uint16_t addr = 0xFF00 + crapstate.cpu.c;
-            crapstate.cpu.a = mem_read_byte(addr);
+            uint16_t addr = 0xFF00 + badstate.cpu.c;
+            badstate.cpu.a = mem_read_byte(addr);
             
-            crapstate.cpu.pc += 1;
-            crapstate.cpu.cycles += 8;
+            badstate.cpu.pc += 1;
+            badstate.cpu.cycles += 8;
             break;
         }
         
         case 0xF3: { // DI
-            crapstate.cpu.ime = 0;
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 4;
+            badstate.cpu.ime = 0;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 4;
             
             break;
         }
@@ -2775,23 +2775,23 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0xF5: { // PUSH AF
-            crapstate.cpu.sp--;
-            mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.af) >> 8); // High byte
-            crapstate.cpu.sp--;
-            mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.af) & 0xFF); // Low byte
+            badstate.cpu.sp--;
+            mem_write_byte(badstate.cpu.sp, (badstate.cpu.af) >> 8); // High byte
+            badstate.cpu.sp--;
+            mem_write_byte(badstate.cpu.sp, (badstate.cpu.af) & 0xFF); // Low byte
             
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 16;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 16;
             break;
         }
         
         case 0xF6: { // OR A, n8
-            uint8_t byte = mem_read_byte(crapstate.cpu.pc+1);
-            crapstate.cpu.a = crapstate.cpu.a | byte;
-            crapstate.cpu.f = 0;
-            crapstate.cpu.Z = !crapstate.cpu.a;
-            crapstate.cpu.pc+=2;
-            crapstate.cpu.cycles += 8;
+            uint8_t byte = mem_read_byte(badstate.cpu.pc+1);
+            badstate.cpu.a = badstate.cpu.a | byte;
+            badstate.cpu.f = 0;
+            badstate.cpu.Z = !badstate.cpu.a;
+            badstate.cpu.pc+=2;
+            badstate.cpu.cycles += 8;
             
             break;
         }
@@ -2802,40 +2802,40 @@ static void opcodes(uint8_t opcode){
         
         case 0xF8: { // LD HL, SP+e8
             // Sameboy code MIT licence
-            int8_t offset = (int8_t)mem_read_byte(crapstate.cpu.pc + 1);
-            crapstate.cpu.hl = crapstate.cpu.sp + offset;
-            crapstate.cpu.f = 0;
-            crapstate.cpu.H =
-            ((crapstate.cpu.sp & 0xF) + (offset & 0xF) > 0xF) ? 1 : 0;
-            crapstate.cpu.C =
-            ((crapstate.cpu.sp & 0xFF) + (offset & 0xFF) > 0xFF) ? 1 : 0;
-            crapstate.cpu.pc += 2;
-            crapstate.cpu.cycles += 12;
+            int8_t offset = (int8_t)mem_read_byte(badstate.cpu.pc + 1);
+            badstate.cpu.hl = badstate.cpu.sp + offset;
+            badstate.cpu.f = 0;
+            badstate.cpu.H =
+            ((badstate.cpu.sp & 0xF) + (offset & 0xF) > 0xF) ? 1 : 0;
+            badstate.cpu.C =
+            ((badstate.cpu.sp & 0xFF) + (offset & 0xFF) > 0xFF) ? 1 : 0;
+            badstate.cpu.pc += 2;
+            badstate.cpu.cycles += 12;
             
             break;
         }
         
         case 0xF9: { //LD SP,HL
-            crapstate.cpu.sp = crapstate.cpu.hl;
-            crapstate.cpu.pc+=1;
-            crapstate.cpu.cycles+=8;
+            badstate.cpu.sp = badstate.cpu.hl;
+            badstate.cpu.pc+=1;
+            badstate.cpu.cycles+=8;
             
             break;
         }
         
         case 0xFA:{ //LD A, a16
-            uint16_t addr = mem_read_word(crapstate.cpu.pc+1);
-            crapstate.cpu.a = mem_read_byte(addr);
-            crapstate.cpu.pc+=3;
-            crapstate.cpu.cycles+=16;
+            uint16_t addr = mem_read_word(badstate.cpu.pc+1);
+            badstate.cpu.a = mem_read_byte(addr);
+            badstate.cpu.pc+=3;
+            badstate.cpu.cycles+=16;
             
             break;
         }
         
         case 0xFB: { // EI
-            crapstate.cpu.ime_pending = 1;
-            crapstate.cpu.pc++;
-            crapstate.cpu.cycles += 4;
+            badstate.cpu.ime_pending = 1;
+            badstate.cpu.pc++;
+            badstate.cpu.cycles += 4;
             
             break;
         }
@@ -2851,14 +2851,14 @@ static void opcodes(uint8_t opcode){
         }
         
         case 0xFE: { //CP A N8
-            uint8_t cpval = mem_read_byte(crapstate.cpu.pc+1);
-            uint8_t res = crapstate.cpu.a - cpval;
-            crapstate.cpu.Z = !res;
-            crapstate.cpu.N = 1;
-            crapstate.cpu.C = cpval > crapstate.cpu.a;
-            crapstate.cpu.H = (crapstate.cpu.a & 0x0F) < (cpval & 0x0F);
-            crapstate.cpu.cycles+=8;
-            crapstate.cpu.pc+=2;
+            uint8_t cpval = mem_read_byte(badstate.cpu.pc+1);
+            uint8_t res = badstate.cpu.a - cpval;
+            badstate.cpu.Z = !res;
+            badstate.cpu.N = 1;
+            badstate.cpu.C = cpval > badstate.cpu.a;
+            badstate.cpu.H = (badstate.cpu.a & 0x0F) < (cpval & 0x0F);
+            badstate.cpu.cycles+=8;
+            badstate.cpu.pc+=2;
             
             break;
         }
@@ -2868,7 +2868,7 @@ static void opcodes(uint8_t opcode){
         }
         
         default:{
-            CRAPLOG("unreachable,something went terribly wrong if you reached this");
+            BADLOG("unreachable,something went terribly wrong if you reached this");
             while(1);
             break;
         }
@@ -2876,42 +2876,42 @@ static void opcodes(uint8_t opcode){
 }
 
 static inline void handle_interrupt() {
-    uint8_t pending = crapstate.io.if_reg & crapstate.io.ie & 0x1F;
+    uint8_t pending = badstate.io.if_reg & badstate.io.ie & 0x1F;
     
     if (!pending){
         return;
     }
     
-    if (crapstate.cpu.halted) {
-        crapstate.cpu.pc++;
-        crapstate.cpu.halted = 0;
+    if (badstate.cpu.halted) {
+        badstate.cpu.pc++;
+        badstate.cpu.halted = 0;
     }
     
-    if (!crapstate.cpu.ime){
+    if (!badstate.cpu.ime){
         return;
     }
-    crapstate.cpu.sp--;
-    mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc ) >> 8); // High byte
-    crapstate.cpu.sp--;
-    mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc ) & 0xFF);
+    badstate.cpu.sp--;
+    mem_write_byte(badstate.cpu.sp, (badstate.cpu.pc ) >> 8); // High byte
+    badstate.cpu.sp--;
+    mem_write_byte(badstate.cpu.sp, (badstate.cpu.pc ) & 0xFF);
     
-    crapstate.cpu.ime = 0;
+    badstate.cpu.ime = 0;
     
-    if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_VBLANK ){
-        crapstate.cpu.pc = VBLANK_VECTOR;
-        crapstate.io.if_reg ^= INTERRUPT_VBLANK;
-    }else if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_STAT ){
-        crapstate.cpu.pc = STAT_VECTOR;
-        crapstate.io.if_reg ^= INTERRUPT_STAT;
-    }else if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_TIMER ){
-        crapstate.cpu.pc = TIMER_VECTOR;
-        crapstate.io.if_reg ^= INTERRUPT_TIMER;
-    }else if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_SERIAL ){
-        crapstate.cpu.pc = SERIAL_VECTOR;
-        crapstate.io.if_reg ^= INTERRUPT_SERIAL;
-    }else if(crapstate.io.ie&crapstate.io.if_reg & INTERRUPT_JOYPAD ){
-        crapstate.cpu.pc = JOYPAD_VECTOR;
-        crapstate.io.if_reg ^= INTERRUPT_JOYPAD;
+    if(badstate.io.ie&badstate.io.if_reg & INTERRUPT_VBLANK ){
+        badstate.cpu.pc = VBLANK_VECTOR;
+        badstate.io.if_reg ^= INTERRUPT_VBLANK;
+    }else if(badstate.io.ie&badstate.io.if_reg & INTERRUPT_STAT ){
+        badstate.cpu.pc = STAT_VECTOR;
+        badstate.io.if_reg ^= INTERRUPT_STAT;
+    }else if(badstate.io.ie&badstate.io.if_reg & INTERRUPT_TIMER ){
+        badstate.cpu.pc = TIMER_VECTOR;
+        badstate.io.if_reg ^= INTERRUPT_TIMER;
+    }else if(badstate.io.ie&badstate.io.if_reg & INTERRUPT_SERIAL ){
+        badstate.cpu.pc = SERIAL_VECTOR;
+        badstate.io.if_reg ^= INTERRUPT_SERIAL;
+    }else if(badstate.io.ie&badstate.io.if_reg & INTERRUPT_JOYPAD ){
+        badstate.cpu.pc = JOYPAD_VECTOR;
+        badstate.io.if_reg ^= INTERRUPT_JOYPAD;
     }
     
     
@@ -2921,11 +2921,11 @@ static inline void handle_interrupt() {
 void update_cpu(){
     handle_interrupt();
     
-    if(crapstate.cpu.ime_pending==1){
-        crapstate.cpu.ime_pending =0;
-        crapstate.cpu.ime=1;
+    if(badstate.cpu.ime_pending==1){
+        badstate.cpu.ime_pending =0;
+        badstate.cpu.ime=1;
     }
     
-    opcodes(mem_read_byte(crapstate.cpu.pc));
+    opcodes(mem_read_byte(badstate.cpu.pc));
     
 }

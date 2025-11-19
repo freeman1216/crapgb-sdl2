@@ -1,6 +1,6 @@
 #pragma once
-#ifndef CRAPSTATE_H
-#define CRAPSTATE_H
+#ifndef BADSTATE_H
+#define BADSTATE_H
 
 #include <stdint.h>
 #include "defines.h"
@@ -36,10 +36,10 @@ typedef struct {
         uint16_t sp;
         
         // CPU flags
-        uint8_t halted : 1;
-        uint8_t ime : 1;       // Interrupt Master Enable
-        uint8_t ime_pending : 1; // For EI delay
-        uint8_t _reserved : 5;
+        uint8_t halted;
+        uint8_t ime ;       // Interrupt Master Enable
+        uint8_t ime_pending; // For EI delay
+
         uint16_t cycles;
     } cpu;
 
@@ -57,7 +57,7 @@ typedef struct {
         // Graphics
         uint8_t vram[VRAM_SIZE]; // VRAM
         
-        uint8_t oam[OAM_SIZE] __attribute__((aligned(4)));     // Sprite RAM
+        uint8_t __attribute__((aligned(4))) oam[OAM_SIZE];     // Sprite RAM
         
        
     } mem;
@@ -109,13 +109,19 @@ typedef struct {
 
 
     struct {
-        uint8_t right:1, left:1, up:1, down:1;
-        uint8_t A:1, B:1, start:1, select:1;
+        uint8_t right;
+        uint8_t left;
+        uint8_t up;
+        uint8_t down;
+        uint8_t A;
+        uint8_t B;
+        uint8_t start;
+        uint8_t select;
     } buttons;
-} crapstate_t;
+} badstate_t;
 
-extern crapstate_t crapstate;
-void crapstate_init();
+extern badstate_t badstate;
+void badstate_init();
 // Global instance
 
 #endif

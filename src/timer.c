@@ -1,4 +1,4 @@
-#include "crapstate.h"
+#include "badstate.h"
 #include "timer.h"
 #include "defines.h"
 
@@ -6,28 +6,28 @@ void update_timer(uint16_t cycles) {
     
     
     // DIV register (always running)
-    crapstate.timing.div_cycles+= cycles;
-    while (crapstate.timing.div_cycles >= 256) { // 16384 Hz
-        crapstate.timing.div_cycles -= 256;
-        crapstate.io.DIV++; // DIV
+    badstate.timing.div_cycles+= cycles;
+    while (badstate.timing.div_cycles >= 256) { // 16384 Hz
+        badstate.timing.div_cycles -= 256;
+        badstate.io.DIV++; // DIV
     }
     
     // TIMA register (controlled by TAC)
-    if (crapstate.io.TAC & TIMA_ENABLE_MASK) { // Timer enabled
-        uint8_t tac = crapstate.io.TAC & TIMA_CLOCK_SELECT_MASK;
+    if (badstate.io.TAC & TIMA_ENABLE_MASK) { // Timer enabled
+        uint8_t tac = badstate.io.TAC & TIMA_CLOCK_SELECT_MASK;
         uint16_t threshold = (tac == 0) ? 1024 : // 4096 Hz
                             (tac == 1) ? 16 :   // 262144 Hz
                             (tac == 2) ? 64 :   // 65536 Hz
                             256;                // 16384 Hz
         
-        crapstate.timing.tima_cycles += cycles;
-        while (crapstate.timing.tima_cycles >= threshold) {
-            crapstate.timing.tima_cycles -= threshold;
-            if (crapstate.io.TIMA == 0xFF) {
-                crapstate.io.TIMA = crapstate.io.TMA; 
+        badstate.timing.tima_cycles += cycles;
+        while (badstate.timing.tima_cycles >= threshold) {
+            badstate.timing.tima_cycles -= threshold;
+            if (badstate.io.TIMA == 0xFF) {
+                badstate.io.TIMA = badstate.io.TMA; 
                 REQUEST_INTERRUPT(INTERRUPT_TIMER); 
             } else {
-                crapstate.io.TIMA++;
+                badstate.io.TIMA++;
             }
         }
     }

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef DEFINES_H
-#define DEFINES_H
+#ifndef BADDEFINES_H
+#define BADDEFINES_H
 
 
 
@@ -78,7 +78,7 @@
 
 
 //interrupt defines
-#define REQUEST_INTERRUPT(mask)  crapstate.io.if_reg |= mask 
+#define REQUEST_INTERRUPT(mask)  badstate.io.if_reg |= mask 
 #define INTERRUPT_VBLANK   (0x01)  // Bit 0
 #define INTERRUPT_STAT     (0x02)  // Bit 1
 #define INTERRUPT_TIMER    (0x04)  // Bit 2
@@ -92,7 +92,7 @@
 #define SERIAL_VECTOR      (0x0058)
 #define JOYPAD_VECTOR      (0x0060)
 //Logging macro
-#define CRAPLOG(fmt, ...) \
+#define BADLOG(fmt, ...) \
     do { \
         fprintf(stderr, "[LOG] "); \
         fprintf(stderr, fmt, ##__VA_ARGS__); \

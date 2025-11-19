@@ -1,4 +1,4 @@
-# CrapGB SDL2 variant
+# BadGB SDL2 variant
 
 A gameboy emulator written in C for learning purposes
 Passes blargg's instruction tests and [dmg-acid2](https://github.com/mattcurrie/dmg-acid2) PPU test
@@ -35,7 +35,7 @@ make
 ## Usage
 
 ```bash
-crapgb-sdl2 some-rom.gb
+badgb-sdl2 some-rom.gb
 ```
 
 ## Special Thanks

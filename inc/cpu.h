@@ -1,6 +1,6 @@
 #pragma once
-#ifndef CPU_H
-#define  CPU_H
+#ifndef BADCPU_H
+#define  BADCPU_H
 
 void update_cpu();
 

@@ -5,7 +5,7 @@ INCLUDES = -Iinc/ -ISDL2
 
 SRC_DIR = src
 BUILD_DIR = build
-BIN = $(BUILD_DIR)/crapgb-sdl2
+BIN = $(BUILD_DIR)/badgb-sdl2
 
 # Find all .c files in src/
 CFILES = $(wildcard $(SRC_DIR)/*.c)

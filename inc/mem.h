@@ -17,6 +17,8 @@ typedef enum{
     JOYP_BUTTONS = 0x20,
 }joypad_part_t;
 
-void flag_joypad_interrupt(joypad_part_t);
+void flag_joypad_interrupt_buttons();
+
+void flag_joypad_interrupt_dpad();
 
 #endif

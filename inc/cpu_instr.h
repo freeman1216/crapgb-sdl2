@@ -27,289 +27,289 @@
  *
  */
 #pragma once
-#ifndef CPU_INSTR_H
-#define CPU_INSTR_H
+#ifndef BADCPU_INSTR_H
+#define BADCPU_INSTR_H
 // CPU instructions code generation
 // 16-bit instr
 
 #define LD_R16_N16(dest)                                                       \
-  crapstate.cpu.dest = mem_read_word(crapstate.cpu.pc + 1);                    \
-  crapstate.cpu.pc += 3;                                                       \
-  crapstate.cpu.cycles += 12;                                                  \
+  badstate.cpu.dest = mem_read_word(badstate.cpu.pc + 1);                    \
+  badstate.cpu.pc += 3;                                                       \
+  badstate.cpu.cycles += 12;                                                  \
   break
 
 #define INC_R16(dest)                                                          \
-  crapstate.cpu.dest++;                                                        \
-  crapstate.cpu.pc++;                                                          \
-  crapstate.cpu.cycles += 8;                                                   \
+  badstate.cpu.dest++;                                                        \
+  badstate.cpu.pc++;                                                          \
+  badstate.cpu.cycles += 8;                                                   \
   break
 
 #define DEC_R16(operand)                                                       \
-  crapstate.cpu.operand--;                                                     \
-  crapstate.cpu.pc++;                                                          \
-  crapstate.cpu.cycles += 8;                                                   \
+  badstate.cpu.operand--;                                                     \
+  badstate.cpu.pc++;                                                          \
+  badstate.cpu.cycles += 8;                                                   \
   break
 
 #define PUSH_R16(rhigh, rlow)                                                  \
-  crapstate.cpu.sp--;                                                          \
-  mem_write_byte(crapstate.cpu.sp, crapstate.cpu.rhigh);                       \
-  crapstate.cpu.sp--;                                                          \
-  mem_write_byte(crapstate.cpu.sp, crapstate.cpu.rlow);                        \
-  crapstate.cpu.pc++;                                                          \
-  crapstate.cpu.cycles += 16;                                                  \
+  badstate.cpu.sp--;                                                          \
+  mem_write_byte(badstate.cpu.sp, badstate.cpu.rhigh);                       \
+  badstate.cpu.sp--;                                                          \
+  mem_write_byte(badstate.cpu.sp, badstate.cpu.rlow);                        \
+  badstate.cpu.pc++;                                                          \
+  badstate.cpu.cycles += 16;                                                  \
   break
 
 #define POP_R16(operand)                                                       \
-  uint8_t low = mem_read_byte(crapstate.cpu.sp++);                             \
-  uint8_t high = mem_read_byte(crapstate.cpu.sp++);                            \
-  crapstate.cpu.operand = (uint16_t)low | ((uint16_t)high << 8);               \
-  crapstate.cpu.pc++;                                                          \
-  crapstate.cpu.cycles += 12;                                                  \
+  uint8_t low = mem_read_byte(badstate.cpu.sp++);                             \
+  uint8_t high = mem_read_byte(badstate.cpu.sp++);                            \
+  badstate.cpu.operand = (uint16_t)low | ((uint16_t)high << 8);               \
+  badstate.cpu.pc++;                                                          \
+  badstate.cpu.cycles += 12;                                                  \
   break
 // 8-bit instr
 // 8-bit loads
 #define LD_R8_N8(dest)                                                         \
-  crapstate.cpu.dest = mem_read_byte(crapstate.cpu.pc + 1);                    \
-  crapstate.cpu.pc += 2;                                                       \
-  crapstate.cpu.cycles += 8;                                                   \
+  badstate.cpu.dest = mem_read_byte(badstate.cpu.pc + 1);                    \
+  badstate.cpu.pc += 2;                                                       \
+  badstate.cpu.cycles += 8;                                                   \
   break
 
 #define LD_R8_R8(dest, source)                                                 \
-  crapstate.cpu.dest = crapstate.cpu.source;                                   \
-  crapstate.cpu.pc++;                                                          \
-  crapstate.cpu.cycles += 4;                                                   \
+  badstate.cpu.dest = badstate.cpu.source;                                   \
+  badstate.cpu.pc++;                                                          \
+  badstate.cpu.cycles += 4;                                                   \
   break
 
 #define LD_R8_FROM_HL(dest)                                                    \
-  crapstate.cpu.dest = mem_read_byte(crapstate.cpu.hl);                        \
-  crapstate.cpu.pc++;                                                          \
-  crapstate.cpu.cycles += 8;                                                   \
+  badstate.cpu.dest = mem_read_byte(badstate.cpu.hl);                        \
+  badstate.cpu.pc++;                                                          \
+  badstate.cpu.cycles += 8;                                                   \
   break
 
 #define LD_TO_HL_R8(source)                                                    \
-  mem_write_byte(crapstate.cpu.hl, crapstate.cpu.source);                      \
-  crapstate.cpu.pc++;                                                          \
-  crapstate.cpu.cycles += 8;                                                   \
+  mem_write_byte(badstate.cpu.hl, badstate.cpu.source);                      \
+  badstate.cpu.pc++;                                                          \
+  badstate.cpu.cycles += 8;                                                   \
   break
 
 #define LD_R8_SAME()                                                           \
-  crapstate.cpu.pc++;                                                          \
-  crapstate.cpu.cycles += 4;                                                   \
+  badstate.cpu.pc++;                                                          \
+  badstate.cpu.cycles += 4;                                                   \
   break
 // 8 bit arithmetic
 #define INC_R8(operand)                                                        \
-  crapstate.cpu.H = ((crapstate.cpu.operand & 0x0F) + 1) > 0x0F;               \
-  crapstate.cpu.operand++;                                                     \
-  crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
-  crapstate.cpu.N = 0;                                                         \
-  crapstate.cpu.pc++;                                                          \
-  crapstate.cpu.cycles += 4;                                                   \
+  badstate.cpu.H = ((badstate.cpu.operand & 0x0F) + 1) > 0x0F;               \
+  badstate.cpu.operand++;                                                     \
+  badstate.cpu.Z = !badstate.cpu.operand;                                    \
+  badstate.cpu.N = 0;                                                         \
+  badstate.cpu.pc++;                                                          \
+  badstate.cpu.cycles += 4;                                                   \
   break
 
 #define DEC_R8(operand)                                                        \
-  crapstate.cpu.H = !(crapstate.cpu.operand & 0x0F);                           \
-  crapstate.cpu.operand--;                                                     \
-  crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
-  crapstate.cpu.N = 1;                                                         \
-  crapstate.cpu.pc++;                                                          \
-  crapstate.cpu.cycles += 4;                                                   \
+  badstate.cpu.H = !(badstate.cpu.operand & 0x0F);                           \
+  badstate.cpu.operand--;                                                     \
+  badstate.cpu.Z = !badstate.cpu.operand;                                    \
+  badstate.cpu.N = 1;                                                         \
+  badstate.cpu.pc++;                                                          \
+  badstate.cpu.cycles += 4;                                                   \
   break
 
 #define ADD_A_R8(addend)                                                       \
-  uint8_t old_a = crapstate.cpu.a;                                             \
-  crapstate.cpu.a += crapstate.cpu.addend;                                     \
-  crapstate.cpu.Z = !crapstate.cpu.a;                                          \
-  crapstate.cpu.N = 0;                                                         \
-  crapstate.cpu.H = ((old_a & 0x0F) + (crapstate.cpu.addend & 0x0F)) > 0x0F;   \
-  crapstate.cpu.C = old_a > crapstate.cpu.a;                                   \
-  crapstate.cpu.pc++;                                                          \
-  crapstate.cpu.cycles += 4;                                                   \
+  uint8_t old_a = badstate.cpu.a;                                             \
+  badstate.cpu.a += badstate.cpu.addend;                                     \
+  badstate.cpu.Z = !badstate.cpu.a;                                          \
+  badstate.cpu.N = 0;                                                         \
+  badstate.cpu.H = ((old_a & 0x0F) + (badstate.cpu.addend & 0x0F)) > 0x0F;   \
+  badstate.cpu.C = old_a > badstate.cpu.a;                                   \
+  badstate.cpu.pc++;                                                          \
+  badstate.cpu.cycles += 4;                                                   \
   break
 
 #define ADC_A_R8(addend)                                                       \
-  uint8_t old_a = crapstate.cpu.a;                                             \
-  uint16_t result = old_a + crapstate.cpu.addend + crapstate.cpu.C;            \
-  crapstate.cpu.a = (uint8_t)result;                                           \
-  crapstate.cpu.Z = (crapstate.cpu.a == 0);                                    \
-  crapstate.cpu.N = 0;                                                         \
-  crapstate.cpu.H =                                                            \
-      ((old_a & 0xF) + (crapstate.cpu.addend & 0xF) + crapstate.cpu.C) > 0xF;  \
-  crapstate.cpu.C = (result > 0xFF);                                           \
-  crapstate.cpu.pc += 1;                                                       \
-  crapstate.cpu.cycles += 4;                                                   \
+  uint8_t old_a = badstate.cpu.a;                                             \
+  uint16_t result = old_a + badstate.cpu.addend + badstate.cpu.C;            \
+  badstate.cpu.a = (uint8_t)result;                                           \
+  badstate.cpu.Z = (badstate.cpu.a == 0);                                    \
+  badstate.cpu.N = 0;                                                         \
+  badstate.cpu.H =                                                            \
+      ((old_a & 0xF) + (badstate.cpu.addend & 0xF) + badstate.cpu.C) > 0xF;  \
+  badstate.cpu.C = (result > 0xFF);                                           \
+  badstate.cpu.pc += 1;                                                       \
+  badstate.cpu.cycles += 4;                                                   \
   break
 
 #define SUB_A_R8(subtrahend)                                                   \
-  crapstate.cpu.C = crapstate.cpu.subtrahend > crapstate.cpu.a;                \
-  crapstate.cpu.H =                                                            \
-      (crapstate.cpu.a & 0x0F) < (crapstate.cpu.subtrahend & 0x0F);            \
-  crapstate.cpu.a = crapstate.cpu.a - crapstate.cpu.subtrahend;                \
-  crapstate.cpu.Z = !crapstate.cpu.a;                                          \
-  crapstate.cpu.N = 1;                                                         \
-  crapstate.cpu.cycles += 4;                                                   \
-  crapstate.cpu.pc += 1;                                                       \
+  badstate.cpu.C = badstate.cpu.subtrahend > badstate.cpu.a;                \
+  badstate.cpu.H =                                                            \
+      (badstate.cpu.a & 0x0F) < (badstate.cpu.subtrahend & 0x0F);            \
+  badstate.cpu.a = badstate.cpu.a - badstate.cpu.subtrahend;                \
+  badstate.cpu.Z = !badstate.cpu.a;                                          \
+  badstate.cpu.N = 1;                                                         \
+  badstate.cpu.cycles += 4;                                                   \
+  badstate.cpu.pc += 1;                                                       \
   break;
 
 // Taken from PeanutGB (MIT Licence)
 #define SBC_A_R8(subtrahend)                                                   \
   uint16_t temp =                                                              \
-      crapstate.cpu.a - (crapstate.cpu.subtrahend + crapstate.cpu.C);          \
-  crapstate.cpu.C = (temp & 0xFF00) ? 1 : 0;                                   \
-  crapstate.cpu.H =                                                            \
-      ((crapstate.cpu.a ^ crapstate.cpu.subtrahend ^ temp) & 0x10) > 0;        \
-  crapstate.cpu.N = 1;                                                         \
-  crapstate.cpu.Z = ((temp & 0xFF) == 0x00);                                   \
-  crapstate.cpu.a = (temp & 0xFF);                                             \
-  crapstate.cpu.pc += 1;                                                       \
-  crapstate.cpu.cycles += 4;                                                   \
+      badstate.cpu.a - (badstate.cpu.subtrahend + badstate.cpu.C);          \
+  badstate.cpu.C = (temp & 0xFF00) ? 1 : 0;                                   \
+  badstate.cpu.H =                                                            \
+      ((badstate.cpu.a ^ badstate.cpu.subtrahend ^ temp) & 0x10) > 0;        \
+  badstate.cpu.N = 1;                                                         \
+  badstate.cpu.Z = ((temp & 0xFF) == 0x00);                                   \
+  badstate.cpu.a = (temp & 0xFF);                                             \
+  badstate.cpu.pc += 1;                                                       \
+  badstate.cpu.cycles += 4;                                                   \
   break
 
 // 8-bit bitwise operations
 #define AND_A_R8(operand)                                                      \
-  crapstate.cpu.a &= crapstate.cpu.operand;                                    \
-  crapstate.cpu.f = 0;                                                         \
-  crapstate.cpu.H = 1;                                                         \
-  crapstate.cpu.Z = !crapstate.cpu.a;                                          \
-  crapstate.cpu.pc += 1;                                                       \
-  crapstate.cpu.cycles += 4;                                                   \
+  badstate.cpu.a &= badstate.cpu.operand;                                    \
+  badstate.cpu.f = 0;                                                         \
+  badstate.cpu.H = 1;                                                         \
+  badstate.cpu.Z = !badstate.cpu.a;                                          \
+  badstate.cpu.pc += 1;                                                       \
+  badstate.cpu.cycles += 4;                                                   \
   break
 
 #define XOR_A_R8(operand)                                                      \
-  crapstate.cpu.a ^= crapstate.cpu.operand;                                    \
-  crapstate.cpu.f = 0;                                                         \
-  crapstate.cpu.Z = !crapstate.cpu.a;                                          \
-  crapstate.cpu.pc++;                                                          \
-  crapstate.cpu.cycles += 4;                                                   \
+  badstate.cpu.a ^= badstate.cpu.operand;                                    \
+  badstate.cpu.f = 0;                                                         \
+  badstate.cpu.Z = !badstate.cpu.a;                                          \
+  badstate.cpu.pc++;                                                          \
+  badstate.cpu.cycles += 4;                                                   \
   break
 
 #define OR_A_R8(operand)                                                       \
-  crapstate.cpu.a = crapstate.cpu.a | crapstate.cpu.operand;                   \
-  crapstate.cpu.f = 0;                                                         \
-  crapstate.cpu.Z = !crapstate.cpu.a;                                          \
-  crapstate.cpu.pc++;                                                          \
-  crapstate.cpu.cycles += 4;                                                   \
+  badstate.cpu.a = badstate.cpu.a | badstate.cpu.operand;                   \
+  badstate.cpu.f = 0;                                                         \
+  badstate.cpu.Z = !badstate.cpu.a;                                          \
+  badstate.cpu.pc++;                                                          \
+  badstate.cpu.cycles += 4;                                                   \
   break
 
 #define CP_A_R8(operand)                                                       \
-  uint8_t res = crapstate.cpu.a - crapstate.cpu.operand;                       \
-  crapstate.cpu.Z = !res;                                                      \
-  crapstate.cpu.N = 1;                                                         \
-  crapstate.cpu.C = crapstate.cpu.operand > crapstate.cpu.a;                   \
-  crapstate.cpu.H = (crapstate.cpu.a & 0x0F) < (crapstate.cpu.operand & 0x0F); \
-  crapstate.cpu.cycles += 4;                                                   \
-  crapstate.cpu.pc += 1;                                                       \
+  uint8_t res = badstate.cpu.a - badstate.cpu.operand;                       \
+  badstate.cpu.Z = !res;                                                      \
+  badstate.cpu.N = 1;                                                         \
+  badstate.cpu.C = badstate.cpu.operand > badstate.cpu.a;                   \
+  badstate.cpu.H = (badstate.cpu.a & 0x0F) < (badstate.cpu.operand & 0x0F); \
+  badstate.cpu.cycles += 4;                                                   \
+  badstate.cpu.pc += 1;                                                       \
   break
 // Misc instr
 #define RST(addr)                                                              \
-  crapstate.cpu.sp--;                                                          \
-  mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 1) >> 8);               \
-  crapstate.cpu.sp--;                                                          \
-  mem_write_byte(crapstate.cpu.sp, (crapstate.cpu.pc + 1) & 0xFF);             \
-  crapstate.cpu.pc = addr;                                                     \
-  crapstate.cpu.cycles += 16;                                                  \
+  badstate.cpu.sp--;                                                          \
+  mem_write_byte(badstate.cpu.sp, (badstate.cpu.pc + 1) >> 8);               \
+  badstate.cpu.sp--;                                                          \
+  mem_write_byte(badstate.cpu.sp, (badstate.cpu.pc + 1) & 0xFF);             \
+  badstate.cpu.pc = addr;                                                     \
+  badstate.cpu.cycles += 16;                                                  \
   break
 
 // CB instr
 #define RLC_R8(operand)                                                        \
-  crapstate.cpu.operand =                                                      \
-      (crapstate.cpu.operand << 1) | (crapstate.cpu.operand >> 7);             \
-  crapstate.cpu.f = 0;                                                         \
-  crapstate.cpu.C = crapstate.cpu.operand & 0x1;                               \
-  crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
+  badstate.cpu.operand =                                                      \
+      (badstate.cpu.operand << 1) | (badstate.cpu.operand >> 7);             \
+  badstate.cpu.f = 0;                                                         \
+  badstate.cpu.C = badstate.cpu.operand & 0x1;                               \
+  badstate.cpu.Z = !badstate.cpu.operand;                                    \
   break
 
 #define RRC_R8(operand)                                                        \
-  crapstate.cpu.f = 0;                                                         \
-  crapstate.cpu.C = crapstate.cpu.operand & 0x1;                               \
-  crapstate.cpu.operand =                                                      \
-      (crapstate.cpu.operand >> 1) | (crapstate.cpu.operand << 7);             \
-  crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
+  badstate.cpu.f = 0;                                                         \
+  badstate.cpu.C = badstate.cpu.operand & 0x1;                               \
+  badstate.cpu.operand =                                                      \
+      (badstate.cpu.operand >> 1) | (badstate.cpu.operand << 7);             \
+  badstate.cpu.Z = !badstate.cpu.operand;                                    \
   break
 
 #define RL_R8(operand)                                                         \
-  uint8_t old_carry = crapstate.cpu.C;                                         \
-  crapstate.cpu.f = 0;                                                         \
-  crapstate.cpu.C = (crapstate.cpu.operand) & 0x80 ? 1 : 0;                    \
-  crapstate.cpu.operand <<= 1;                                                 \
-  crapstate.cpu.operand |= old_carry;                                          \
-  crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
+  uint8_t old_carry = badstate.cpu.C;                                         \
+  badstate.cpu.f = 0;                                                         \
+  badstate.cpu.C = (badstate.cpu.operand) & 0x80 ? 1 : 0;                    \
+  badstate.cpu.operand <<= 1;                                                 \
+  badstate.cpu.operand |= old_carry;                                          \
+  badstate.cpu.Z = !badstate.cpu.operand;                                    \
   break
 
 #define RR_R8(operand)                                                         \
-  uint8_t old_carry = crapstate.cpu.C;                                         \
-  crapstate.cpu.f = 0;                                                         \
-  crapstate.cpu.C = crapstate.cpu.operand & 1;                                 \
-  crapstate.cpu.operand >>= 1;                                                 \
-  crapstate.cpu.operand |= (old_carry << 7);                                   \
-  crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
+  uint8_t old_carry = badstate.cpu.C;                                         \
+  badstate.cpu.f = 0;                                                         \
+  badstate.cpu.C = badstate.cpu.operand & 1;                                 \
+  badstate.cpu.operand >>= 1;                                                 \
+  badstate.cpu.operand |= (old_carry << 7);                                   \
+  badstate.cpu.Z = !badstate.cpu.operand;                                    \
   break
 
 #define SLA_R8(operand)                                                        \
-  crapstate.cpu.f = 0;                                                         \
-  crapstate.cpu.C = (crapstate.cpu.operand & 0x80) != 0;                       \
-  crapstate.cpu.operand <<= 1;                                                 \
-  crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
+  badstate.cpu.f = 0;                                                         \
+  badstate.cpu.C = (badstate.cpu.operand & 0x80) != 0;                       \
+  badstate.cpu.operand <<= 1;                                                 \
+  badstate.cpu.Z = !badstate.cpu.operand;                                    \
   break
 
 #define SRA_R8(operand)                                                        \
-  crapstate.cpu.f = 0;                                                         \
-  crapstate.cpu.C = crapstate.cpu.operand & 0x1;                               \
-  crapstate.cpu.operand =                                                      \
-      (crapstate.cpu.operand >> 1) | (crapstate.cpu.operand & 0x80);           \
-  crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
+  badstate.cpu.f = 0;                                                         \
+  badstate.cpu.C = badstate.cpu.operand & 0x1;                               \
+  badstate.cpu.operand =                                                      \
+      (badstate.cpu.operand >> 1) | (badstate.cpu.operand & 0x80);           \
+  badstate.cpu.Z = !badstate.cpu.operand;                                    \
   break
 
 #define SWAP_R8(operand)                                                       \
-  crapstate.cpu.operand =                                                      \
-      (crapstate.cpu.operand << 4) | (crapstate.cpu.operand >> 4);             \
-  crapstate.cpu.f = 0;                                                         \
-  crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
+  badstate.cpu.operand =                                                      \
+      (badstate.cpu.operand << 4) | (badstate.cpu.operand >> 4);             \
+  badstate.cpu.f = 0;                                                         \
+  badstate.cpu.Z = !badstate.cpu.operand;                                    \
   break
 
 #define SRL_R8(operand)                                                        \
-  crapstate.cpu.f = 0;                                                         \
-  crapstate.cpu.C = (crapstate.cpu.operand & 0x01);                            \
-  crapstate.cpu.operand >>= 1;                                                 \
-  crapstate.cpu.Z = !crapstate.cpu.operand;                                    \
+  badstate.cpu.f = 0;                                                         \
+  badstate.cpu.C = (badstate.cpu.operand & 0x01);                            \
+  badstate.cpu.operand >>= 1;                                                 \
+  badstate.cpu.Z = !badstate.cpu.operand;                                    \
   break
 
 #define BIT_N_R8(bit, operand)                                                 \
-  crapstate.cpu.Z = !(crapstate.cpu.operand & (1 << bit));                     \
-  crapstate.cpu.N = 0;                                                         \
-  crapstate.cpu.H = 1;                                                         \
+  badstate.cpu.Z = !(badstate.cpu.operand & (1 << bit));                     \
+  badstate.cpu.N = 0;                                                         \
+  badstate.cpu.H = 1;                                                         \
   break
 
 #define BIT_N_AT_HL(bit)                                                       \
-  uint8_t byte = mem_read_byte(crapstate.cpu.hl);                              \
-  crapstate.cpu.Z = !(byte & (1 << bit));                                      \
-  crapstate.cpu.N = 0;                                                         \
-  crapstate.cpu.H = 1;                                                         \
-  crapstate.cpu.cycles += 4;                                                   \
+  uint8_t byte = mem_read_byte(badstate.cpu.hl);                              \
+  badstate.cpu.Z = !(byte & (1 << bit));                                      \
+  badstate.cpu.N = 0;                                                         \
+  badstate.cpu.H = 1;                                                         \
+  badstate.cpu.cycles += 4;                                                   \
   break
 #define RES_N_R8(bit, operand)                                                 \
-  crapstate.cpu.operand &= (uint8_t)~(1 << bit);                               \
+  badstate.cpu.operand &= (uint8_t)~(1 << bit);                               \
   break
 
 #define RES_N_AT_HL(bit)                                                       \
-  uint8_t byte = mem_read_byte(crapstate.cpu.hl);                              \
+  uint8_t byte = mem_read_byte(badstate.cpu.hl);                              \
   byte &= (uint8_t)~(1 << bit);                                                \
-  mem_write_byte(crapstate.cpu.hl, byte);                                      \
-  crapstate.cpu.cycles += 8;                                                   \
+  mem_write_byte(badstate.cpu.hl, byte);                                      \
+  badstate.cpu.cycles += 8;                                                   \
   break
 
 #define SET_N_R8(bit, operand)                                                 \
-  crapstate.cpu.operand |= (uint8_t)(1 << bit);                                \
+  badstate.cpu.operand |= (uint8_t)(1 << bit);                                \
   break
 
 #define SET_N_AT_HL(bit)                                                       \
-  uint8_t byte = mem_read_byte(crapstate.cpu.hl);                              \
+  uint8_t byte = mem_read_byte(badstate.cpu.hl);                              \
   byte |= (1 << bit);                                                          \
-  mem_write_byte(crapstate.cpu.hl, byte);                                      \
-  crapstate.cpu.cycles += 8;                                                   \
+  mem_write_byte(badstate.cpu.hl, byte);                                      \
+  badstate.cpu.cycles += 8;                                                   \
   break
 
 #define UNHANDLED_OPCODE()                                                     \
-  CRAPLOG("UNHANDLED_OPCODE");                                                 \
+  BADLOG("UNHANDLED_OPCODE");                                                 \
   while (1)                                                                    
     
 #endif

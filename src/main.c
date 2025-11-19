@@ -11,7 +11,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "crapstate.h"
+#include "badstate.h"
 #include "timer.h"
 #include "cpu.h"
 #include "ppu.h"
@@ -24,18 +24,18 @@ int main(int argc,char** argv ){
     }
     FILE* cartridge = fopen(argv[1],"rb");
     if(cartridge == NULL){
-        CRAPLOG("Cannot open cartridge\n");
+        BADLOG("Cannot open cartridge\n");
         return -1;
     }
     if(mem_init(cartridge)){
         return -1;
     }
 
-    crapstate_init();
+    badstate_init();
     
     assert(SDL_Init(SDL_INIT_VIDEO) == 0);
     
-    SDL_Window *window = SDL_CreateWindow("gbcrapemu", SDL_WINDOWPOS_CENTERED,  SDL_WINDOWPOS_CENTERED , PIXELS_PER_SCANLINE*2, VISIBLE_SCANLINES*2, SDL_WINDOW_RESIZABLE | SDL_WINDOW_INPUT_FOCUS);
+    SDL_Window *window = SDL_CreateWindow("gbbademu", SDL_WINDOWPOS_CENTERED,  SDL_WINDOWPOS_CENTERED , PIXELS_PER_SCANLINE*2, VISIBLE_SCANLINES*2, SDL_WINDOW_RESIZABLE | SDL_WINDOW_INPUT_FOCUS);
     assert(window);
     SDL_SetWindowMinimumSize(window, PIXELS_PER_SCANLINE  , VISIBLE_SCANLINES);
     
@@ -80,35 +80,35 @@ int main(int argc,char** argv ){
                     case SDL_KEYUP: {
                         switch (event.key.keysym.sym) {
                             case SDLK_RETURN:{
-                                crapstate.buttons.start = 0;
+                                badstate.buttons.start = 0;
                                 break;
                             }
                             case SDLK_TAB:{
-                                crapstate.buttons.select = 0;
+                                badstate.buttons.select = 0;
                                 break;
                             }
                             case SDLK_z:{
-                                crapstate.buttons.A = 0;
+                                badstate.buttons.A = 0;
                                 break;
                             }
                             case SDLK_x:{
-                                crapstate.buttons.B = 0;
+                                badstate.buttons.B = 0;
                                 break;
                             }
                             case SDLK_a:{
-                                crapstate.buttons.left = 0;
+                                badstate.buttons.left = 0;
                                 break;
                             }
                             case SDLK_s:{
-                                crapstate.buttons.down = 0;
+                                badstate.buttons.down = 0;
                                 break;
                             }
                             case SDLK_d:{
-                                crapstate.buttons.right = 0;
+                                badstate.buttons.right = 0;
                                 break;
                             }
                             case SDLK_w:{
-                                crapstate.buttons.up = 0;
+                                badstate.buttons.up = 0;
                                 break;
                             }
                         }
@@ -117,43 +117,43 @@ int main(int argc,char** argv ){
                     case SDL_KEYDOWN:{
                         switch (event.key.keysym.sym) {
                             case SDLK_RETURN:{
-                                crapstate.buttons.start = 1;
-                                flag_joypad_interrupt(JOYP_BUTTONS);
+                                badstate.buttons.start = 1;
+                                flag_joypad_interrupt_buttons();
                                 break;
                             }
                             case SDLK_TAB:{
-                                crapstate.buttons.select = 1;
-                                flag_joypad_interrupt(JOYP_BUTTONS);
+                                badstate.buttons.select = 1;
+                                flag_joypad_interrupt_buttons();
                                 break;
                             }
                             case SDLK_z:{
-                                crapstate.buttons.A = 1;
-                                flag_joypad_interrupt(JOYP_BUTTONS);
+                                badstate.buttons.A = 1;
+                                flag_joypad_interrupt_buttons();
                                 break;
                             }
                             case SDLK_x:{
-                                crapstate.buttons.B = 1;
-                                flag_joypad_interrupt(JOYP_BUTTONS);
+                                badstate.buttons.B = 1;
+                                flag_joypad_interrupt_buttons();
                                 break;
                             }
                             case SDLK_a:{
-                                crapstate.buttons.left = 1;
-                                flag_joypad_interrupt(JOYP_DPAD);
+                                badstate.buttons.left = 1;
+                                flag_joypad_interrupt_dpad();
                                 break;
                             }
                             case SDLK_s:{
-                                crapstate.buttons.down = 1;
-                                flag_joypad_interrupt(JOYP_DPAD);
+                                badstate.buttons.down = 1;
+                                flag_joypad_interrupt_dpad();
                                 break;
                             }
                             case SDLK_d:{
-                                crapstate.buttons.right = 1;
-                                flag_joypad_interrupt(JOYP_DPAD);
+                                badstate.buttons.right = 1;
+                                flag_joypad_interrupt_dpad();
                                 break;
                             }
                             case SDLK_w:{
-                                crapstate.buttons.up = 1;
-                                flag_joypad_interrupt(JOYP_DPAD);
+                                badstate.buttons.up = 1;
+                                flag_joypad_interrupt_dpad();
                                 break;
                             }
                         }
@@ -161,22 +161,22 @@ int main(int argc,char** argv ){
                     }
                 }
             }
-            while (crapstate.display.frame_finished!=1) {
+            while (badstate.display.frame_finished!=1) {
                 
                 update_cpu();
-                update_timer(crapstate.cpu.cycles);
-                update_ppu(crapstate.cpu.cycles);
-                crapstate.cpu.cycles=0;
+                update_timer(badstate.cpu.cycles);
+                update_ppu(badstate.cpu.cycles);
+                badstate.cpu.cycles=0;
                 
             }
-            assert(SDL_UpdateTexture(texture, NULL, &crapstate.display.pixels, PIXELS_PER_SCANLINE * sizeof(uint16_t))==0);
+            assert(SDL_UpdateTexture(texture, NULL, &badstate.display.pixels, PIXELS_PER_SCANLINE * sizeof(uint16_t))==0);
             
             assert( SDL_RenderClear(renderer)==0);
             assert(SDL_RenderCopy(renderer, texture, NULL, NULL)==0);
             SDL_RenderPresent(renderer);
 
             vblank_counter++;
-            crapstate.display.frame_finished = 0;
+            badstate.display.frame_finished = 0;
         }
         vblank_counter = 0;
         uint32_t delta =  SDL_GetTicks() -  milis_start;
